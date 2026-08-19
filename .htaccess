@@ -1,0 +1,20 @@
+# RE360 — Apache config (Hostinger)
+
+# Default document
+DirectoryIndex index.php
+
+# Block direct access to sensitive folders/files
+<FilesMatch "\.(sql)$">
+  Require all denied
+</FilesMatch>
+
+# (config/ and sql/ are protected by their own .htaccess files)
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes

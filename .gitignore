@@ -1,0 +1,18 @@
+# Local-only database credentials (never commit)
+config/db.local.php
+
+# Uploaded files (brochures, floor plans, documents)
+uploads/*
+!uploads/.htaccess
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Logs and temp
+*.log
+_*.php
