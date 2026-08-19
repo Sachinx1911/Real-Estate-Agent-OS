@@ -42,9 +42,9 @@ require __DIR__ . '/../includes/header.php';
 </div>
 
 <div class="card">
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
+  <div class="month-grid">
     <?php foreach (['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] as $d): ?>
-      <div class="muted tiny center" style="padding:6px 0;font-weight:600;letter-spacing:.5px;text-transform:uppercase"><?= $d ?></div>
+      <div class="dow"><?= $d ?></div>
     <?php endforeach; ?>
 
     <?php for ($i=0;$i<$startDow;$i++): ?><div></div><?php endfor; ?>
@@ -52,12 +52,10 @@ require __DIR__ . '/../includes/header.php';
     <?php for ($d=1;$d<=$daysIn;$d++):
       $isToday = $isCurrentMonth && $d===$todayD;
       $dayEvents = $events[$d] ?? []; ?>
-      <div class="card" style="background:var(--bg-card-2);padding:9px;min-height:96px;<?= $isToday?'box-shadow:inset 0 0 0 1.5px var(--primary)':'' ?>">
-        <div style="font-weight:<?= $isToday?'800':'600' ?>;font-size:12.5px;color:<?= $isToday?'var(--primary)':'var(--text-2)' ?>;margin-bottom:6px"><?= $d ?></div>
+      <div class="month-cell<?= $isToday ? ' is-today' : '' ?>">
+        <div class="daynum"><?= $d ?></div>
         <?php foreach (array_slice($dayEvents,0,3) as $ev): ?>
-          <div class="badge <?= $ev['color'] ?>" style="display:block;margin-bottom:4px;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-            <?= e($ev['label']) ?>
-          </div>
+          <div class="ev badge <?= $ev['color'] ?>" title="<?= e($ev['label']) ?>"><?= e($ev['label']) ?></div>
         <?php endforeach; ?>
         <?php if (count($dayEvents)>3): ?><div class="muted tiny">+<?= count($dayEvents)-3 ?> more</div><?php endif; ?>
       </div>

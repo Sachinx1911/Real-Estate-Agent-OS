@@ -231,7 +231,7 @@ require __DIR__ . '/../includes/header.php';
       <span class="badge <?= $feat['status']==='ready'?'green':'blue' ?>"><?= $GLOBALS['RE360_PROJECT_STATUS'][$feat['status']] ?? $feat['status'] ?></span>
     </div>
 
-    <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px">
+    <div class="grid strip" style="grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px">
       <?php
         $facts = [
           ['Type', ucfirst($feat['type'])],
@@ -247,7 +247,7 @@ require __DIR__ . '/../includes/header.php';
       <?php endforeach; ?>
     </div>
 
-    <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px;text-align:center">
+    <div class="grid strip" style="grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px;text-align:center">
       <?php foreach ([['Towers',$feat['total_towers']],['Units',$feat['total_units']],['Available',$featStats['available']],['Sold',$featStats['sold']],['On Hold',$featStats['hold']]] as $s): ?>
         <div><div style="font-size:17px;font-weight:800"><?= num($s[1]) ?></div><div class="muted tiny"><?= $s[0] ?></div></div>
       <?php endforeach; ?>
@@ -278,7 +278,7 @@ require __DIR__ . '/../includes/header.php';
         <?php foreach ($snapConfigs as $c): ?><option value="<?= e($c['config']) ?>"><?= e($c['config']) ?></option><?php endforeach; ?></select>
       <select class="select" id="fStatus" onchange="loadSnapshot()"><option value="">Status: All</option>
         <?php foreach ($GLOBALS['RE360_INV_STATUS'] as $s): ?><option value="<?= $s ?>"><?= ucfirst($s) ?></option><?php endforeach; ?></select>
-      <div class="search" style="flex:1;min-width:150px;background:var(--bg-card-2);padding:7px 12px">
+      <div class="search" style="flex:1;min-width:150px;background:var(--bg-card-2)">
         <?= icon('search',15) ?><input type="text" id="fSearch" placeholder="Search flat no. / tower..." oninput="debounceSnapshot()">
       </div>
     </div>

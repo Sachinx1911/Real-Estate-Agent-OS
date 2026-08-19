@@ -56,7 +56,7 @@ require __DIR__ . '/../includes/header.php';
         <?= $p['rera_reg_date'] ? ' · Registered '.fdate($p['rera_reg_date']) : '' ?></div>
       <?php if ($p['description']): ?><div class="small" style="margin-top:8px;color:var(--text-2)"><?= e($p['description']) ?></div><?php endif; ?>
     </div>
-    <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:10px;text-align:center;min-width:380px">
+    <div class="grid strip" style="grid-template-columns:repeat(5,1fr);gap:10px;text-align:center">
       <?php foreach ([['Towers',$p['total_towers']],['Units',$p['total_units']],['Available',$stats['available']],['Hold',$stats['hold']],['Sold',$stats['sold']]] as $s): ?>
         <div class="card" style="background:var(--bg-card-2);padding:10px">
           <div style="font-size:17px;font-weight:800"><?= num($s[1]) ?></div><div class="muted tiny"><?= $s[0] ?></div>

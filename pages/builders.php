@@ -39,7 +39,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
         <span class="badge <?= $scCls ?>"><?= $sc ?>/10</span>
       </div>
-      <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;text-align:center">
+      <div class="grid strip" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;text-align:center">
         <div><div style="font-weight:800"><?= (int)$b['proj_count'] ?></div><div class="muted tiny">Projects</div></div>
         <div><div style="font-weight:800"><?= (int)$b['delivered_projects'] ?></div><div class="muted tiny">Delivered</div></div>
         <div><div style="font-weight:800"><?= (int)$b['years_in_business'] ?></div><div class="muted tiny">Years</div></div>

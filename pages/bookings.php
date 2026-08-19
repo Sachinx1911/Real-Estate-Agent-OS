@@ -93,7 +93,7 @@ require __DIR__ . '/../includes/header.php';
             <td>
               <form method="post" style="display:flex;gap:6px">
                 <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
-                <select class="select" name="update_stage" style="padding:5px 8px;font-size:12px" onchange="this.form.submit()">
+                <select class="select sm" name="update_stage" onchange="this.form.submit()">
                   <option value="">Change…</option>
                   <?php foreach (['token'=>'Token','booked'=>'Booked','agreement'=>'Agreement','registered'=>'Registered'] as $k=>$l): ?>
                     <?php if ($k !== $b['stage']): ?><option value="<?= $k ?>"><?= $l ?></option><?php endif; ?>

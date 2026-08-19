@@ -94,7 +94,7 @@ require __DIR__ . '/../includes/header.php';
             <td>
               <form method="post" style="display:inline">
                 <input type="hidden" name="doc_id" value="<?= $d['id'] ?>">
-                <select class="select" name="set_status" style="padding:5px 8px;font-size:12px" onchange="this.form.submit()">
+                <select class="select sm" name="set_status" onchange="this.form.submit()">
                   <option value="">Set…</option>
                   <option value="verified">Verified</option>
                   <option value="pending">Pending</option>

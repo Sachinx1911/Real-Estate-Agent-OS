@@ -48,7 +48,7 @@ require __DIR__ . '/../includes/header.php';
         <div><div class="muted tiny"><?= e($f[0]) ?></div><div style="font-size:13px;font-weight:600;margin-top:2px"><?= e($f[1] ?: '—') ?></div></div>
       <?php endforeach; ?>
     </div>
-    <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px;text-align:center">
+    <div class="grid strip" style="grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px;text-align:center">
       <?php foreach ([['Total',$b['total_projects']],['Completed',$b['completed_projects']],['Ongoing',$b['ongoing_projects']],['Upcoming',$b['upcoming_projects']],['Delivered',$b['delivered_projects']]] as $s): ?>
         <div class="card" style="background:var(--bg-card-2);padding:10px">
           <div style="font-size:17px;font-weight:800"><?= (int)$s[1] ?></div><div class="muted tiny"><?= $s[0] ?></div>

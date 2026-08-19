@@ -114,7 +114,7 @@ require __DIR__ . '/../includes/header.php';
 
 <div class="card mt">
   <div class="card-head"><h3>System Data</h3></div>
-  <div class="grid" style="grid-template-columns:repeat(6,1fr);gap:12px;text-align:center">
+  <div class="grid strip" style="grid-template-columns:repeat(6,1fr);gap:12px;text-align:center">
     <?php foreach ($counts as $lbl=>$n): ?>
       <div class="card" style="background:var(--bg-card-2);padding:12px">
         <div style="font-size:20px;font-weight:800"><?= number_format($n) ?></div>
