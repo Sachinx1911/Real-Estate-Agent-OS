@@ -38,7 +38,7 @@ require __DIR__ . '/../includes/header.php';
 <?php if ($msg): ?><div class="login-err" style="background:var(--green-bg);color:var(--green);margin-bottom:16px">✓ <?= e($msg) ?></div><?php endif; ?>
 
 <div class="grid" style="grid-template-columns:1fr 1.6fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <div class="card-head"><h3>Add Payment Plan</h3></div>
     <?= select_field('Project','project_id',$projOpts,'',true) ?>
     <div style="margin-top:14px"><?= field('Plan Name','plan_name','','text',['placeholder'=>'Construction Linked (10:10:10:10:60)']) ?></div>
@@ -80,7 +80,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-soft)">
           <span class="badge <?= abs($sum-100) < 0.01 ? 'green':'amber' ?>">Total <?= $sum ?>%</span>
-          <form method="post" onsubmit="return confirm('Delete this plan?')"><input type="hidden" name="delete_id" value="<?= $pl['id'] ?>">
+          <form method="post" onsubmit="return confirm('Delete this plan?')"><?= csrf_field() ?><input type="hidden" name="delete_id" value="<?= $pl['id'] ?>">
             <button class="link" type="submit" style="color:var(--red);font-size:12px">Delete</button></form>
         </div>
       </div>

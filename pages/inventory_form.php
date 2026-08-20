@@ -81,7 +81,7 @@ require __DIR__ . '/../includes/header.php';
 </div>
 
 <!-- SINGLE -->
-<form method="post" class="card" id="mode-single">
+<form method="post" class="card" id="mode-single"><?= csrf_field() ?>
   <input type="hidden" name="mode" value="single">
   <div class="form-grid">
     <?= select_field('Project *','project_id',$projOpts,$projectId ?: $v('project_id'),true) ?>
@@ -106,7 +106,7 @@ require __DIR__ . '/../includes/header.php';
 </form>
 
 <!-- BULK -->
-<form method="post" class="card" id="mode-bulk" style="display:none">
+<form method="post" class="card" id="mode-bulk" style="display:none"><?= csrf_field() ?>
   <input type="hidden" name="mode" value="bulk">
   <div class="form-grid">
     <?= select_field('Project *','project_id',$projOpts,$projectId,true) ?>

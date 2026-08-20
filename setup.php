@@ -16,6 +16,34 @@ $messages = [];
 $errors   = [];
 $done     = false;
 
+/* ------------------------------------------------------------------
+ * Install lock — once setup has run successfully this file refuses to
+ * do anything again. Even if you forget to delete setup.php, nobody can
+ * re-run it and create a second admin account.
+ * To re-run intentionally: delete config/installed.lock
+ * ---------------------------------------------------------------- */
+define('INSTALL_LOCK', __DIR__ . '/config/installed.lock');
+
+if (is_file(INSTALL_LOCK)) {
+    http_response_code(403);
+    ?><!DOCTYPE html>
+    <html lang="en"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Setup locked · <?= SITE_NAME ?></title>
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+    <link rel="stylesheet" href="assets/css/re360.css"></head>
+    <body><div class="login-wrap"><div class="login-card">
+      <h2>Setup already completed</h2>
+      <p class="muted small" style="margin-top:8px">
+        This installation is locked. For security please delete
+        <code>setup.php</code> from the server.
+      </p>
+      <a class="btn primary" href="login.php" style="width:100%;justify-content:center;margin-top:18px">Go to Sign in &rarr;</a>
+    </div></div></body></html><?php
+    exit;
+}
+
 function table_exists(string $t): bool
 {
     try {
@@ -33,7 +61,11 @@ function run_sql_file(string $path): void
     db()->exec($sql); // mysql PDO driver runs multiple statements
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_valid()) {
+    $errors[] = 'Session expired. Please reload this page and try again.';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$errors) {
     $name  = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $pass  = $_POST['password'] ?? '';
@@ -92,6 +124,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+
+    if ($done && !$errors) {
+        @file_put_contents(INSTALL_LOCK, 'Installed on ' . date('c') . "\n");
+    }
 }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -99,6 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setup · <?= SITE_NAME ?></title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/re360.css">
@@ -120,9 +158,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php else: ?>
       <h2 style="margin-top:6px">Create your admin account</h2>
       <p class="muted small" style="margin-top:4px">This also creates the database tables on first run.</p>
-      <form method="post">
+      <form method="post"><?= csrf_field() ?>
         <div class="form-group" style="margin-top:16px"><label>Your name</label>
-          <input class="field-input" name="name" required value="<?= e($_POST['name'] ?? 'Sagar Patil') ?>"></div>
+          <input class="field-input" name="name" required value="<?= e($_POST['name'] ?? '') ?>" placeholder="Your full name"></div>
         <div class="form-group" style="margin-top:14px"><label>Email</label>
           <input class="field-input" type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>"></div>
         <div class="form-group" style="margin-top:14px"><label>Password (min 6 chars)</label>

@@ -253,6 +253,24 @@ function row(string $sql, array $params = [])
     return $st->fetch();
 }
 
+/* Web path of the app root, e.g. "/" or "/re360/".
+ * Lets files in sub-folders (tools/) link back correctly. */
+function app_base_url(): string
+{
+    static $base = null;
+    if ($base !== null) return $base;
+
+    $root = rtrim(str_replace('\\', '/', BASE_PATH), '/');
+    $doc  = rtrim(str_replace('\\', '/', (string)($_SERVER['DOCUMENT_ROOT'] ?? '')), '/');
+
+    if ($doc !== '' && strpos($root, $doc) === 0) {
+        $base = rtrim(substr($root, strlen($doc)), '/') . '/';
+    } else {
+        $base = '/';
+    }
+    return $base;
+}
+
 /* Build a URL to a page */
 function url(string $page, array $params = []): string
 {

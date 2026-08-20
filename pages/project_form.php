@@ -40,7 +40,7 @@ require __DIR__ . '/../includes/header.php';
   <div class="card empty">Add a builder first. <a class="link" href="<?= url('builder_form') ?>">Add Builder →</a></div>
 <?php else: ?>
 
-<form method="post" class="card">
+<form method="post" class="card"><?= csrf_field() ?>
   <div class="form-grid">
     <div class="form-section-title">Basic Information</div>
     <?= field('Project Name *','name',$v('name'),'text',['required'=>'required']) ?>

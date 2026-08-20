@@ -1,9 +1,19 @@
 # Local-only database credentials (never commit)
 config/db.local.php
 
+# Runtime state written by the app on the server
+config/installed.lock
+config/reset.allow
+
 # Uploaded files (brochures, floor plans, documents)
 uploads/*
 !uploads/.htaccess
+
+# Logs and throttle state
+logs/*
+!logs/.htaccess
+!logs/.gitkeep
+*.log
 
 # OS / editor noise
 Thumbs.db
@@ -13,6 +23,5 @@ desktop.ini
 .idea/
 *.swp
 
-# Logs and temp
-*.log
+# Temp
 _*.php

@@ -63,7 +63,7 @@ require __DIR__ . '/../includes/header.php';
 </div>
 
 <div class="grid" style="grid-template-columns:1fr 1.7fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <div class="card-head"><h3>Record a Booking</h3></div>
     <?= select_field('Client','client_id',$clientOpts,'',true) ?>
     <?= select_field('Project','project_id',$projOpts,'',true) ?>
@@ -91,7 +91,7 @@ require __DIR__ . '/../includes/header.php';
             <td><span class="badge <?= ['token'=>'violet','booked'=>'blue','agreement'=>'teal','registered'=>'green'][$b['stage']] ?? 'grey' ?>"><?= ucfirst($b['stage']) ?></span></td>
             <td><?= fdate($b['booking_date']) ?></td>
             <td>
-              <form method="post" style="display:flex;gap:6px">
+              <form method="post" style="display:flex;gap:6px"><?= csrf_field() ?>
                 <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
                 <select class="select sm" name="update_stage" onchange="this.form.submit()">
                   <option value="">Change…</option>

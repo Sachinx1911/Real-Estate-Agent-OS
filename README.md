@@ -6,43 +6,38 @@ PHP + MySQL. No Node, no Composer, no build step — upload and run on Hostinger
 
 ## Hostinger वर कसे टाकायचे (deploy)
 
-### 1. Database तयार करा
-hPanel → **Databases → MySQL Databases**
-- नवीन database बनवा (उदा. `u123456_re360`)
-- User बनवा + password ठेवा
-- **Database name, username, password, host** लिहून ठेवा
+**संपूर्ण step-by-step guide: [DEPLOY.md](DEPLOY.md)** — PHP version, database, SSL,
+permissions, health check, backup, troubleshooting सगळं तिथे आहे.
 
-### 2. Files upload करा
-hPanel → **File Manager** (किंवा FTP)
-- या folder मधली **सर्व files** `public_html/` मध्ये upload करा
-- (Folder structure तशीच ठेवा — `config/`, `includes/`, `pages/`, `api/`, `assets/`, `sql/`, `uploads/`)
+थोडक्यात:
 
-### 3. Database credentials भरा
-`config/db.php` उघडा आणि हे बदला:
+1. **PHP 8.1+** सेट करा (hPanel → PHP Configuration)
+2. **MySQL database** बनवा (hPanel → Databases)
+3. **Files** `public_html/` मध्ये टाका (File Manager / Git / FTP)
+4. `config/db.sample.php` ची copy `config/db.local.php` बनवून credentials भरा
+5. `config/config.php` मध्ये `RE360_ENV` = `'production'` करा
+6. `uploads/` आणि `logs/` ला permission **755** द्या
+7. **SSL** चालू करा (hPanel → Security → SSL) — हे setup च्या आधी करा
+8. `https://yourdomain.com/tools/healthcheck.php` उघडून सगळं हिरवं आहे का बघा
+9. `https://yourdomain.com/setup.php` — tables + admin account तयार होतील
+10. **`setup.php` delete करा** ⚠️
+11. `https://yourdomain.com/` वर login करा
 
-```php
-$DB_HOST = 'localhost';        // Hostinger वर सहसा localhost
-$DB_NAME = 'u123456_re360';    // तुमचे database name
-$DB_USER = 'u123456_sagar';    // तुमचे username
-$DB_PASS = 'your-password';    // तुमचा password
-```
+---
 
-आणि `config/config.php` मध्ये production mode करा:
-```php
-define('RE360_ENV', 'production');
-```
+## Deployment साठी असलेली extra files
 
-### 4. Setup चालवा
-Browser मध्ये उघडा: **`https://yourdomain.com/setup.php`**
-- हे आपोआप सर्व tables बनवेल
-- Admin account तयार करेल (नाव, email, password)
-- "Load demo data" tick ठेवलं तर demo builders/projects/inventory भरेल (पहिल्यांदा बघण्यासाठी उपयोगी)
-
-### 5. Setup file delete करा ⚠️
-Setup झाल्यावर **`setup.php` delete करा** (security साठी महत्त्वाचे).
-
-### 6. Login करा
-`https://yourdomain.com/` → तुमचा email + password.
+| File | काय करते |
+|---|---|
+| `DEPLOY.md` | संपूर्ण Hostinger guide (मराठी) |
+| `tools/healthcheck.php` | Server तपासणी — PHP, extensions, DB, permissions, HTTPS |
+| `tools/reset_password.php` | Password विसरल्यास emergency reset (`config/reset.allow` लागते) |
+| `config/db.sample.php` | Credentials template → copy करून `db.local.php` बनवा |
+| `.user.ini` | PHP limits (upload size, memory, timezone) |
+| `.htaccess` | HTTPS redirect, security headers, caching, error pages |
+| `403.php` `404.php` `500.php` | Custom error pages |
+| `logs/` | PHP error log + login throttle (web वरून block) |
+| `robots.txt` | Search engines ना block करते |
 
 ---
 
@@ -75,12 +70,15 @@ DELETE FROM builders; DELETE FROM tasks; DELETE FROM activity_log;
 index.php          front controller — सर्व pages इथून जातात
 login.php          sign in
 setup.php          पहिल्यांदा चालवायची file (नंतर delete)
-config/            db credentials + constants
-includes/          auth, header, sidebar, footer, helpers, icons, crud
+403/404/500.php    custom error pages
+config/            db credentials + constants (web वरून blocked)
+includes/          auth, csrf, header, sidebar, footer, helpers, icons, crud
 pages/             प्रत्येक module चा एक file
 api/               AJAX endpoints (search, इ.)
-assets/css|js      dark theme + front-end
+assets/css|js|img  dark theme + front-end + icons
 sql/               schema.sql (tables) + seed.sql (demo data)
+tools/             healthcheck.php, reset_password.php
+logs/              php-error.log + login throttle (web वरून blocked)
 uploads/           brochures, floor plans, documents
 ```
 

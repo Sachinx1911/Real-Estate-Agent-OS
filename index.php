@@ -8,6 +8,9 @@ require_once __DIR__ . '/includes/auth.php';
 
 require_login();
 
+// Every form POST inside the app must carry a valid CSRF token
+csrf_check();
+
 $page = preg_replace('/[^a-z_]/', '', strtolower($_GET['page'] ?? 'dashboard'));
 
 // map slug -> page file
@@ -45,7 +48,8 @@ $path = $file ? __DIR__ . '/pages/' . $file : null;
 if ($path && is_file($path)) {
     require $path;
 } else {
-    // graceful placeholder for pages not built yet
+    // unknown slug — tell crawlers and the browser this is not a real page
+    http_response_code(404);
     $pageTitle = ucwords(str_replace('_', ' ', $page));
     require __DIR__ . '/includes/header.php';
     echo '<div class="page-head"><div><h2>' . e($pageTitle) . '</h2>'

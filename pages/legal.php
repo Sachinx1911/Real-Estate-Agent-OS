@@ -66,7 +66,7 @@ require __DIR__ . '/../includes/header.php';
 </div>
 
 <div class="grid mt" style="grid-template-columns:1fr 1.6fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <div class="card-head"><h3>Add Document Record</h3></div>
     <?= select_field('Project','project_id',$projOpts,$projectId,true) ?>
     <div style="margin-top:14px"><?= select_field('Document Type','doc_type',$docTypes,'maharera') ?></div>
@@ -92,7 +92,7 @@ require __DIR__ . '/../includes/header.php';
                 <?= e(ucwords(str_replace('_',' ',$d['status']))) ?></span></td>
             <td><?= e($d['note'] ?: '—') ?></td>
             <td>
-              <form method="post" style="display:inline">
+              <form method="post" style="display:inline"><?= csrf_field() ?>
                 <input type="hidden" name="doc_id" value="<?= $d['id'] ?>">
                 <select class="select sm" name="set_status" onchange="this.form.submit()">
                   <option value="">Set…</option>

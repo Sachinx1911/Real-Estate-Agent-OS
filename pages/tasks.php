@@ -37,7 +37,7 @@ require __DIR__ . '/../includes/header.php';
 </div>
 
 <div class="grid" style="grid-template-columns:1fr 1.7fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <div class="card-head"><h3>Add Follow Up</h3></div>
     <?= field('Title','title','','text',['placeholder'=>'Follow up with Ramesh Patel','required'=>'required']) ?>
     <?= field('Subtitle / Context','subtitle','','text',['placeholder'=>'Paradise Heights – Site Visit']) ?>
@@ -71,7 +71,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
         <span class="badge <?= $pc ?>"><?= ucfirst($t['priority']) ?></span>
         <?php if ($t['status']==='open'): ?>
-          <form method="post" style="display:inline"><input type="hidden" name="done_id" value="<?= $t['id'] ?>">
+          <form method="post" style="display:inline"><?= csrf_field() ?><input type="hidden" name="done_id" value="<?= $t['id'] ?>">
             <button class="btn ghost sm" type="submit">Done</button></form>
         <?php else: ?><span class="badge green">Completed</span><?php endif; ?>
       </div>

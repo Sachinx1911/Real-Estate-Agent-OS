@@ -2,8 +2,14 @@
 /** RE360 — filtered inventory rows for the dashboard snapshot (JSON) */
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_login();
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+
+// AJAX endpoint: answer with JSON instead of redirecting to the login page
+if (!is_logged_in()) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Not signed in']);
+    exit;
+}
 
 $projectId = (int)($_GET['project'] ?? 0);
 $tower     = trim($_GET['tower'] ?? '');

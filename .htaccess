@@ -1,20 +1,95 @@
-# RE360 — Apache config (Hostinger)
+# ============================================================
+#  RE360 — Apache / LiteSpeed configuration (Hostinger)
+# ============================================================
 
-# Default document
+# ---------- Default document ----------
 DirectoryIndex index.php
 
-# Block direct access to sensitive folders/files
-<FilesMatch "\.(sql)$">
+# ---------- No directory listing ----------
+Options -Indexes
+
+# ---------- Force HTTPS + strip www ----------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # http -> https  (Hostinger sets %{HTTPS} once the free SSL is issued)
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+  # www.example.com -> example.com
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+</IfModule>
+
+# ---------- Block sensitive file types everywhere ----------
+<FilesMatch "\.(sql|log|lock|ini|md|json|yml|yaml|sh|bak|old|dist|sample|env)$">
   Require all denied
 </FilesMatch>
 
-# (config/ and sql/ are protected by their own .htaccess files)
-
-# Security headers
-<IfModule mod_headers.c>
-  Header set X-Content-Type-Options "nosniff"
-  Header set X-Frame-Options "SAMEORIGIN"
+# ---------- Block dotfiles (.git, .env, .gitignore, .htpasswd ...) ----------
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule (^|/)\.(?!well-known/) - [F,L]
 </IfModule>
 
-# Prevent directory listing
-Options -Indexes
+# site.webmanifest must stay readable even though .json-ish files are blocked
+<Files "site.webmanifest">
+  Require all granted
+</Files>
+<Files "robots.txt">
+  Require all granted
+</Files>
+
+# ---------- Custom error pages ----------
+ErrorDocument 403 /403.php
+ErrorDocument 404 /404.php
+ErrorDocument 500 /500.php
+
+# ---------- Security headers ----------
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  # Turn HSTS on only after HTTPS is confirmed working on every subdomain:
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always unset X-Powered-By
+  Header always unset Server
+</IfModule>
+
+# ---------- Compression ----------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ---------- Browser caching for static assets ----------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css                "access plus 7 days"
+  ExpiresByType application/javascript  "access plus 7 days"
+  ExpiresByType image/svg+xml           "access plus 30 days"
+  ExpiresByType image/png               "access plus 30 days"
+  ExpiresByType image/jpeg              "access plus 30 days"
+  ExpiresByType image/webp              "access plus 30 days"
+  ExpiresDefault                        "access plus 1 day"
+</IfModule>
+
+# Never cache PHP responses (data changes constantly)
+<FilesMatch "\.php$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  </IfModule>
+</FilesMatch>
+
+# ---------- Upload size (LiteSpeed / Apache with PHP module) ----------
+<IfModule mod_php.c>
+  php_value upload_max_filesize 12M
+  php_value post_max_size 14M
+</IfModule>

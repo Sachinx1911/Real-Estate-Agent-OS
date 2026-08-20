@@ -36,7 +36,7 @@ require __DIR__ . '/../includes/header.php';
 <?php if ($msg): ?><div class="login-err" style="background:var(--green-bg);color:var(--green);margin-bottom:16px">✓ <?= e($msg) ?></div><?php endif; ?>
 
 <div class="grid" style="grid-template-columns:1fr 1.6fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <div class="card-head"><h3>Schedule a Visit</h3></div>
     <?= select_field('Client','client_id',$clientOpts,'',true) ?>
     <?= select_field('Project','project_id',$projOpts,'',true) ?>
@@ -58,7 +58,7 @@ require __DIR__ . '/../includes/header.php';
             <td><?= e($v['pname'] ?: '—') ?></td>
             <td><?= fdate($v['visit_date'],'d M Y, g:i A') ?></td>
             <td><?= e($v['notes'] ?: '—') ?></td>
-            <td><form method="post" style="display:inline"><input type="hidden" name="mark_done" value="<?= $v['id'] ?>">
+            <td><form method="post" style="display:inline"><?= csrf_field() ?><input type="hidden" name="mark_done" value="<?= $v['id'] ?>">
               <button class="btn ghost sm" type="submit">Mark done</button></form></td>
           </tr>
         <?php endforeach; ?>

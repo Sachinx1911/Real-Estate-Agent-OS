@@ -38,7 +38,7 @@ require __DIR__ . '/../includes/header.php';
 </div>
 <?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 
-<form method="post" class="card">
+<form method="post" class="card"><?= csrf_field() ?>
   <div class="form-grid">
     <div class="form-section-title">Client Details</div>
     <?= field('Name *','name',$v('name'),'text',['required'=>'required']) ?>

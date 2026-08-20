@@ -7,13 +7,20 @@ if (is_logged_in()) { header('Location: index.php'); exit; }
 
 $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $pass  = $_POST['password'] ?? '';
-    if (attempt_login($email, $pass)) {
-        header('Location: index.php');
-        exit;
+    $lockedFor = login_locked_for();
+    if (!csrf_valid()) {
+        $err = 'Your session expired. Please try again.';
+    } elseif ($lockedFor > 0) {
+        $err = 'Too many failed attempts. Try again in ' . ceil($lockedFor / 60) . ' minute(s).';
+    } else {
+        $email = $_POST['email'] ?? '';
+        $pass  = $_POST['password'] ?? '';
+        if (attempt_login($email, $pass)) {
+            header('Location: index.php');
+            exit;
+        }
+        $err = 'Invalid email or password.';
     }
-    $err = 'Invalid email or password.';
 }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -21,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign in · <?= SITE_NAME ?></title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/re360.css">
@@ -41,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($err): ?><div class="login-err"><?= e($err) ?></div><?php endif; ?>
 
     <form method="post">
+      <?= csrf_field() ?>
       <div class="form-group">
         <label>Email</label>
         <input class="field-input" type="email" name="email" required autofocus placeholder="you@example.com" value="<?= e($_POST['email'] ?? '') ?>">

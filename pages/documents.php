@@ -53,7 +53,7 @@ require __DIR__ . '/../includes/header.php';
 <?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 
 <div class="grid" style="grid-template-columns:1fr 1.8fr">
-  <form method="post" enctype="multipart/form-data" class="card">
+  <form method="post" enctype="multipart/form-data" class="card"><?= csrf_field() ?>
     <div class="card-head"><h3>Upload Document</h3></div>
     <div class="form-group"><label>File (max 10 MB)</label>
       <input class="field-input" type="file" name="file" required></div>
@@ -91,7 +91,7 @@ require __DIR__ . '/../includes/header.php';
             <td><?= fdate($d['created_at'],'d M Y') ?></td>
             <td>
               <a class="link" href="<?= e($d['file_path']) ?>" target="_blank" rel="noopener">Open</a> ·
-              <form method="post" style="display:inline" onsubmit="return confirm('Delete this document?')">
+              <form method="post" style="display:inline" onsubmit="return confirm('Delete this document?')"><?= csrf_field() ?>
                 <input type="hidden" name="delete_id" value="<?= $d['id'] ?>">
                 <button class="link" type="submit" style="color:var(--red)">Delete</button></form>
             </td>

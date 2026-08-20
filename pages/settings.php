@@ -60,7 +60,7 @@ require __DIR__ . '/../includes/header.php';
 <?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 
 <div class="grid" style="grid-template-columns:1fr 1fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <input type="hidden" name="action" value="profile">
     <div class="card-head"><h3>My Profile</h3></div>
     <?= field('Name','name',$me['name']) ?>
@@ -71,7 +71,7 @@ require __DIR__ . '/../includes/header.php';
     <button class="btn primary" type="submit" style="margin-top:16px">Save Profile</button>
   </form>
 
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <input type="hidden" name="action" value="password">
     <div class="card-head"><h3>Change Password</h3></div>
     <div class="form-group"><label>Current Password</label><input class="field-input" type="password" name="current_password" required></div>
@@ -82,7 +82,7 @@ require __DIR__ . '/../includes/header.php';
 
 <?php if ($me['role'] === 'admin'): ?>
 <div class="grid mt" style="grid-template-columns:1fr 1.5fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <input type="hidden" name="action" value="adduser">
     <div class="card-head"><h3>Add Team Member</h3></div>
     <?= field('Name','u_name') ?>

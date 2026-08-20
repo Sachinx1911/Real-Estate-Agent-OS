@@ -33,7 +33,7 @@ require __DIR__ . '/../includes/header.php';
 <?php if ($msg): ?><div class="login-err" style="background:var(--green-bg);color:var(--green);margin-bottom:16px">✓ <?= e($msg) ?></div><?php endif; ?>
 
 <div class="grid" style="grid-template-columns:1fr 1.8fr">
-  <form method="post" class="card">
+  <form method="post" class="card"><?= csrf_field() ?>
     <div class="card-head"><h3>Add Offer</h3></div>
     <?= select_field('Project','project_id',$projOpts,'',true) ?>
     <?= select_field('Offer Type','type',$types,'festive') ?>
@@ -60,7 +60,7 @@ require __DIR__ . '/../includes/header.php';
             <td><span class="badge <?= $o['official_or_verbal']==='official'?'green':'amber' ?>"><?= ucfirst($o['official_or_verbal']) ?></span></td>
             <td><?= fdate($o['valid_till']) ?><?php if ($expired): ?><div class="tiny" style="color:var(--red)">Expired</div><?php endif; ?></td>
             <td><span class="badge <?= $o['is_active'] && !$expired ? 'green':'grey' ?>"><?= $o['is_active'] ? ($expired?'Expired':'Active') : 'Inactive' ?></span></td>
-            <td><form method="post"><input type="hidden" name="toggle_id" value="<?= $o['id'] ?>">
+            <td><form method="post"><?= csrf_field() ?><input type="hidden" name="toggle_id" value="<?= $o['id'] ?>">
               <button class="btn ghost sm" type="submit"><?= $o['is_active']?'Disable':'Enable' ?></button></form></td>
           </tr>
         <?php endforeach; ?>

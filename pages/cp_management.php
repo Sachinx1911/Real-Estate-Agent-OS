@@ -57,7 +57,7 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<form method="post" class="card mt">
+<form method="post" class="card mt"><?= csrf_field() ?>
   <div class="card-head"><h3><?= $editBuilder ? 'Edit' : 'Add' ?> CP Terms</h3></div>
   <div class="form-grid">
     <?= select_field('Builder *','builder_id',$builderOpts,$editBuilder,true) ?>
