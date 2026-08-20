@@ -9,9 +9,32 @@ const RE360 = {
   closeSearch() {
     document.getElementById('searchModal')?.classList.remove('open');
   },
+  /* ---------------- Theme ----------------
+   * The palette lives entirely in CSS custom properties, so switching is
+   * just a class on <html>. The choice is remembered per browser; with
+   * nothing stored the OS preference decides. A copy of this runs inline
+   * in header.php before first paint to avoid a flash of the wrong theme.
+   */
+  currentTheme() {
+    return document.documentElement.classList.contains('light') ? 'light' : 'dark';
+  },
+  applyTheme(theme) {
+    document.documentElement.classList.toggle('light', theme === 'light');
+    try { localStorage.setItem('re360-theme', theme); } catch (e) {}
+    const btn = document.getElementById('themeBtn');
+    if (btn) btn.title = theme === 'light' ? 'Switch to dark' : 'Switch to light';
+  },
   toggleTheme() {
-    // The app is dark-first. Light mode kept minimal for now.
-    document.documentElement.classList.toggle('light');
+    this.applyTheme(this.currentTheme() === 'light' ? 'dark' : 'light');
+  },
+
+  /* ---------------- Notifications ---------------- */
+  toggleNotifications(ev) {
+    if (ev) ev.stopPropagation();
+    document.getElementById('notifPanel')?.classList.toggle('open');
+  },
+  closeNotifications() {
+    document.getElementById('notifPanel')?.classList.remove('open');
   },
   money(r) {
     r = +r || 0;
@@ -45,10 +68,18 @@ const RE360 = {
 
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); RE360.openSearch(); }
-  if (e.key === 'Escape') RE360.closeSearch();
+  if (e.key === 'Escape') { RE360.closeSearch(); RE360.closeNotifications(); }
+});
+
+// Click anywhere outside the dropdown closes it
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.notif-wrap')) RE360.closeNotifications();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Keep the button tooltip in step with whatever the inline script picked
+  RE360.applyTheme(RE360.currentTheme());
+
   const si = document.getElementById('searchInput');
   if (si) {
     let t;
@@ -60,9 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* Chart.js global defaults for dark theme */
+/* Chart.js global defaults — read from the theme so charts follow it too */
 if (window.Chart) {
-  Chart.defaults.color = '#7c88a3';
-  Chart.defaults.borderColor = '#1e2740';
+  const css = getComputedStyle(document.documentElement);
+  Chart.defaults.color = css.getPropertyValue('--text-muted').trim() || '#7c88a3';
+  Chart.defaults.borderColor = css.getPropertyValue('--border').trim() || '#1e2740';
   Chart.defaults.font.family = "'Inter', sans-serif";
 }

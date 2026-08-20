@@ -118,6 +118,16 @@ foreach ($checks as $g) foreach ($g as $c) { if (!$c['ok']) { $c['warn'] ? $warn
   <title>Health check · <?= SITE_NAME ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
   <link rel="stylesheet" href="../assets/css/re360.css">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re360-theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      document.documentElement.classList.toggle('light', t === 'light');
+    })();
+  </script>
   <style>
     .hc-wrap{max-width:760px;margin:40px auto;padding:0 20px}
     .hc-row{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border-soft)}

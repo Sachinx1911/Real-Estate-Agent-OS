@@ -146,6 +146,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$errors) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/re360.css">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re360-theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      document.documentElement.classList.toggle('light', t === 'light');
+    })();
+  </script>
 </head>
 <body>
 <div class="login-wrap">

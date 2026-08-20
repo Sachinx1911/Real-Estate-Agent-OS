@@ -45,7 +45,74 @@
   --field-h-sm: 30px;  /* dense controls inside table rows */
 
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* surfaces that used to be hardcoded */
+  --sidebar-bg:   linear-gradient(180deg, #0c1226 0%, #0a0f1f 100%);
+  --scroll:       #202a45;
+  --scroll-hover: #2b385c;
+  --text-faint:   #3a4560;
+  --overlay:      rgba(4,7,15,.66);
+  --topbar-bg:    rgba(10,14,26,.82);
+
+  color-scheme: dark;
 }
+
+/* ============================================================
+   LIGHT THEME
+   Only the tokens are redefined — every rule below already reads
+   them, so nothing else has to change. html.light is set by
+   RE360.applyTheme() before first paint.
+   ============================================================ */
+:root.light {
+  /* surfaces */
+  --bg:            #f5f7fb;
+  --bg-2:          #eef2f9;
+  --bg-card:       #ffffff;
+  --bg-card-2:     #f8fafc;
+  --bg-hover:      #eaeffa;
+  --border:        #dfe5f0;
+  --border-soft:   #eaeef6;
+
+  /* brand — slightly deeper so it holds contrast on white */
+  --primary:       #5b3ce8;
+  --primary-2:     #4a2ed6;
+  --primary-soft:  rgba(91,60,232,.10);
+  --secondary:     #0d9488;
+
+  /* text */
+  --text:          #131826;
+  --text-2:        #48536b;
+  --text-muted:    #6b7793;
+
+  /* status — darkened for readability on light tints */
+  --green:  #15803d;  --green-bg:  rgba(34,197,94,.13);
+  --amber:  #b45309;  --amber-bg:  rgba(245,158,11,.15);
+  --gold:   #a16207;  --gold-bg:   rgba(234,179,8,.16);
+  --blue:   #1d4ed8;  --blue-bg:   rgba(59,130,246,.12);
+  --violet: #6d28d9;  --violet-bg: rgba(139,92,246,.12);
+  --teal:   #0f766e;  --teal-bg:   rgba(45,212,191,.16);
+  --red:    #b91c1c;  --red-bg:    rgba(239,68,68,.12);
+  --pink:   #be185d;  --pink-bg:   rgba(236,72,153,.12);
+  --grey:   #475569;  --grey-bg:   rgba(100,116,139,.12);
+
+  --shadow: 0 6px 24px rgba(19,24,38,.10);
+
+  --sidebar-bg:   linear-gradient(180deg, #ffffff 0%, #f4f7fd 100%);
+  --scroll:       #cbd5e6;
+  --scroll-hover: #aebcd4;
+  --text-faint:   #a8b2c6;
+  --overlay:      rgba(19,24,38,.38);
+  --topbar-bg:    rgba(245,247,251,.82);
+
+  color-scheme: light;
+}
+
+/* The sidebar is a dark slab in dark mode and a white one in light mode,
+   so its own text colours have to follow the theme rather than stay white. */
+:root.light .sidebar { border-right: 1px solid var(--border); }
+:root.light .nav a.active { color: var(--primary); box-shadow: inset 0 0 0 1px rgba(91,60,232,.28); }
+:root.light .brand .logo { box-shadow: 0 6px 18px rgba(91,60,232,.28); }
+:root.light .table thead th { background: var(--bg-2); }
 
 /* ---------- reset ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,8 +130,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 input, select, textarea { font-family: inherit; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #202a45; border-radius: 20px; }
-::-webkit-scrollbar-thumb:hover { background: #2b385c; }
+::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 20px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-hover); }
 
 .muted { color: var(--text-muted); }
 .small { font-size: 12px; }
@@ -82,7 +149,7 @@ input, select, textarea { font-family: inherit; }
 .sidebar {
   width: var(--sidebar-w);
   flex: 0 0 var(--sidebar-w);
-  background: linear-gradient(180deg, #0c1226 0%, #0a0f1f 100%);
+  background: var(--sidebar-bg);
   border-right: 1px solid var(--border-soft);
   display: flex;
   flex-direction: column;
@@ -167,7 +234,7 @@ input, select, textarea { font-family: inherit; }
   display: flex; align-items: center; gap: 12px;
   padding: 14px 24px;
   position: sticky; top: 0; z-index: 30;
-  background: rgba(10,14,26,.82); backdrop-filter: blur(12px);
+  background: var(--topbar-bg); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-soft);
 }
 .greet { flex: 0 0 auto; }
@@ -387,7 +454,7 @@ table.data tbody td.strong { color: var(--text); font-weight: 600; }
 .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; text-align: center; }
 .cal-grid .dow { font-size: 10.5px; color: var(--text-muted); padding: 4px 0; }
 .cal-grid .day { padding: 7px 0; border-radius: 8px; font-size: 12.5px; color: var(--text-2); }
-.cal-grid .day.out { color: #3a4560; opacity: .5; }
+.cal-grid .day.out { color: var(--text-faint); opacity: .5; }
 .cal-grid .day:hover { background: var(--bg-hover); }
 .cal-grid .day.today { background: var(--primary); color: #fff; font-weight: 700; }
 .cal-grid .day.has-event { position: relative; }
@@ -434,7 +501,7 @@ table.data tbody td.strong { color: var(--text); font-weight: 600; }
 .score-row .val { width: 34px; text-align: right; font-weight: 700; font-size: 12.5px; }
 
 /* Modal */
-.modal-overlay { position: fixed; inset: 0; background: rgba(4,7,14,.72); backdrop-filter: blur(3px);
+.modal-overlay { position: fixed; inset: 0; background: var(--overlay); backdrop-filter: blur(3px);
   display: none; place-items: center; z-index: 100; padding: 20px; }
 .modal-overlay.open { display: grid; }
 .modal { width: 100%; max-width: 560px; background: var(--bg-card); border: 1px solid var(--border);
@@ -503,3 +570,46 @@ span.ic { display: inline-flex; align-items: center; justify-content: center; fl
   .grid.strip[style*="grid-template-columns"] { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
   .kpi .k-value { font-size: 23px; }
 }
+
+/* ============================================================
+   NOTIFICATIONS DROPDOWN
+   ============================================================ */
+.notif-wrap { position: relative; }
+.notif-panel {
+  display: none;
+  position: absolute; right: 0; top: calc(100% + 10px);
+  width: 340px; max-width: calc(100vw - 32px);
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  z-index: 60; overflow: hidden;
+}
+.notif-panel.open { display: block; }
+.notif-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 15px; border-bottom: 1px solid var(--border-soft);
+}
+.notif-head h4 { font-size: 13.5px; font-weight: 700; }
+.notif-list { max-height: 340px; overflow-y: auto; }
+.notif-item {
+  display: flex; gap: 11px; align-items: flex-start;
+  padding: 11px 15px; border-bottom: 1px solid var(--border-soft);
+  transition: .12s;
+}
+.notif-item:last-child { border-bottom: 0; }
+.notif-item:hover { background: var(--bg-hover); }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; margin-top: 6px; }
+.notif-item .n-title { font-weight: 600; font-size: 13px; color: var(--text); line-height: 1.4; }
+.notif-item .n-meta  { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.notif-empty { padding: 26px 15px; text-align: center; color: var(--text-muted); font-size: 12.5px; }
+.notif-foot { padding: 10px 15px; border-top: 1px solid var(--border-soft); text-align: center; }
+.notif-foot a { color: var(--primary); font-size: 12.5px; font-weight: 600; }
+@media (max-width: 560px) {
+  .notif-panel { position: fixed; right: 12px; left: 12px; top: 66px; width: auto; }
+}
+
+/* Theme button shows the mode you would switch TO:
+   sun while dark ("go light"), moon while light ("go dark"). */
+#themeBtn .ic-moon { display: none; }
+#themeBtn .ic-sun  { display: inline-flex; }
+:root.light #themeBtn .ic-sun  { display: none; }
+:root.light #themeBtn .ic-moon { display: inline-flex; }

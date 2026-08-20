@@ -63,6 +63,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Password reset · <?= SITE_NAME ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
   <link rel="stylesheet" href="../assets/css/re360.css">
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('re360-theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      document.documentElement.classList.toggle('light', t === 'light');
+    })();
+  </script>
 </head>
 <body>
 <div class="login-wrap">
