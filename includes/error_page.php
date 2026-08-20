@@ -6,7 +6,7 @@
  */
 function re360_error_page(int $code, string $title, string $message): void
 {
-    http_response_code($code);
+    if (!headers_sent()) http_response_code($code);
 
     // Work out the app root as the browser sees it, without needing config.php
     $root = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');

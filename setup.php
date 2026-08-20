@@ -72,7 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$errors) {
     $loadDemo = !empty($_POST['load_demo']);
 
     // 1. connection
-    try { db(); } catch (Throwable $e) { $errors[] = 'DB connection failed. Check config/db.php.'; }
+    try {
+        db();
+    } catch (Throwable $e) {
+        $errors[] = 'Database connection failed. Check the credentials in config/db.local.php '
+                  . '(database name and username usually need the u123456789_ prefix).';
+        $errors[] = 'MySQL said: ' . $e->getMessage();
+    }
 
     if (!$errors) {
         // 2. schema

@@ -41,12 +41,15 @@ function db(): PDO
     try {
         $pdo = new PDO($dsn, $DB_USER, $DB_PASS, $options);
     } catch (PDOException $e) {
-        if (defined('RE360_ENV') && RE360_ENV === 'development') {
-            die('<pre style="color:#f88;background:#111;padding:20px;font-family:monospace">'
-                . "Database connection failed:\n" . htmlspecialchars($e->getMessage())
-                . "\n\nCheck config/db.php credentials and that the database exists.</pre>");
-        }
-        die('Service temporarily unavailable.');
+        /* Throw rather than die() — setup.php and tools/healthcheck.php both
+         * catch this and explain the problem far better than a bare message.
+         * Anything that does not catch it lands in the global handler in
+         * config.php, which shows the 500 page and logs the detail. */
+        throw new RuntimeException(
+            'Database connection failed: ' . $e->getMessage()
+            . ' (host=' . $DB_HOST . ', db=' . $DB_NAME . ', user=' . $DB_USER . ')',
+            0, $e
+        );
     }
 
     return $pdo;

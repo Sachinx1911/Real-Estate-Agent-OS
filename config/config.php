@@ -62,6 +62,28 @@ $GLOBALS['RE360_PROJECT_STATUS'] = [
     'on_hold'            => 'On Hold',
 ];
 
+// ---- Uncaught errors ----
+// Development: show what actually broke. Production: friendly page + private log.
+set_exception_handler(function (Throwable $ex) {
+    error_log('[RE360] Uncaught ' . get_class($ex) . ': ' . $ex->getMessage()
+              . ' in ' . $ex->getFile() . ':' . $ex->getLine());
+
+    if (RE360_ENV === 'development') {
+        if (!headers_sent()) http_response_code(500);
+        echo '<pre style="color:#f88;background:#111;padding:20px;font-family:monospace;'
+           . 'white-space:pre-wrap;line-height:1.6">'
+           . htmlspecialchars(get_class($ex) . ': ' . $ex->getMessage(), ENT_QUOTES, 'UTF-8')
+           . "\n\n" . htmlspecialchars($ex->getFile() . ':' . $ex->getLine(), ENT_QUOTES, 'UTF-8')
+           . "\n\n" . htmlspecialchars($ex->getTraceAsString(), ENT_QUOTES, 'UTF-8')
+           . '</pre>';
+        exit;
+    }
+
+    require_once BASE_PATH . '/includes/error_page.php';
+    re360_error_page(500, 'Something went wrong',
+        'The server hit an unexpected problem. It has been written to the log. Please try again in a moment.');
+});
+
 // ---- Session ----
 if (session_status() === PHP_SESSION_NONE) {
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')

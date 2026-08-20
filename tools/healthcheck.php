@@ -72,7 +72,11 @@ try {
     $dbOk = true;
     check('Database', 'Connection', true, 'MySQL ' . $ver);
 } catch (Throwable $e) {
-    check('Database', 'Connection', false, 'FAILED — check config/db.local.php credentials');
+    // Show what MySQL actually said — "Access denied" and "Unknown database"
+    // need completely different fixes.
+    check('Database', 'Connection', false, 'FAILED — ' . $e->getMessage());
+    check('Database', 'What to check', false,
+          'config/db.local.php: database name and username usually need the u123456789_ prefix; host is normally localhost');
 }
 
 if ($dbOk) {
