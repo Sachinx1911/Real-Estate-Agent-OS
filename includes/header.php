@@ -71,7 +71,7 @@ $defaultLoc = 'Panvel';
   <link rel="manifest" href="site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/re360.css">
+  <link rel="stylesheet" href="<?= asset('assets/css/re360.css') ?>">
   <script>
     // Runs before the body paints, so the saved theme never flashes the wrong one.
     (function () {

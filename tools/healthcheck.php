@@ -117,7 +117,7 @@ foreach ($checks as $g) foreach ($g as $c) { if (!$c['ok']) { $c['warn'] ? $warn
   <meta name="robots" content="noindex, nofollow">
   <title>Health check · <?= SITE_NAME ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
-  <link rel="stylesheet" href="../assets/css/re360.css">
+  <link rel="stylesheet" href="<?= asset('assets/css/re360.css', '../') ?>">
   <script>
     (function () {
       var t = null;

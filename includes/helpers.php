@@ -253,6 +253,24 @@ function row(string $sql, array $params = [])
     return $st->fetch();
 }
 
+/* Versioned URL for a static file.
+ *
+ * .htaccess tells browsers to keep CSS and JS for a week, which is right for
+ * speed and wrong for deploys — a returning user would keep the old file and
+ * see a half-styled page. Stamping the file's mtime onto the URL means a
+ * changed file is a new URL, so the cache updates the moment we ship.
+ *
+ *   asset('assets/css/re360.css')        -> assets/css/re360.css?v=1755678901
+ *   asset('assets/css/re360.css', '../') -> ../assets/css/re360.css?v=1755678901
+ */
+function asset(string $path, string $prefix = ''): string
+{
+    $path = ltrim($path, '/');
+    $file = BASE_PATH . '/' . $path;
+    $v    = is_file($file) ? filemtime($file) : false;
+    return $prefix . $path . ($v ? '?v=' . $v : '');
+}
+
 /* Web path of the app root, e.g. "/" or "/re360/".
  * Lets files in sub-folders (tools/) link back correctly. */
 function app_base_url(): string

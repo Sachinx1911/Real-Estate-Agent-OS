@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="robots" content="noindex, nofollow">
   <title>Password reset · <?= SITE_NAME ?></title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
-  <link rel="stylesheet" href="../assets/css/re360.css">
+  <link rel="stylesheet" href="<?= asset('assets/css/re360.css', '../') ?>">
   <script>
     (function () {
       var t = null;
