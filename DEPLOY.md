@@ -121,15 +121,24 @@ $DB_CHARSET = 'utf8mb4';
 
 ---
 
-## Step 5 — Production mode चालू करा
+## Step 5 — Production mode (काहीच करायचं नाही)
 
-`config/config.php` उघडा, वरची ओळ बदला:
+App आपोआप ओळखतो. Domain वर चालत असेल तर **production**, आणि `localhost` / `127.0.0.1` /
+`.test` / `.local` वर असेल तरच development.
+
+म्हणजे server वर PHP errors visitor ला कधीच दिसणार नाहीत — ते `logs/php-error.log` मध्ये जातील.
+
+> `config/config.php` मध्ये हाताने बदल करू नका. ती file git मध्ये आहे — पुढच्या **Pull** ला
+> तुमचा बदल पुसला जाईल आणि site नकळत errors दाखवायला लागेल.
+
+तात्पुरतं server वर errors बघायचे असतील तर `config/env.php` नावाची file बनवा:
 
 ```php
-define('RE360_ENV', 'production');   // 'development' चं 'production' करा
+<?php
+$RE360_ENV = 'development';
 ```
 
-यामुळे PHP errors visitor ला दिसणार नाहीत — ते `logs/php-error.log` मध्ये जातील.
+**काम झाल्यावर ती file लगेच delete करा.** ती git मध्ये जात नाही, त्यामुळे Pull ने आपोआप जाणार नाही.
 
 ---
 
@@ -291,7 +300,7 @@ DELETE FROM builders; DELETE FROM tasks; DELETE FROM activity_log;
 |---|---|
 | **500 Internal Server Error** | बहुतेक `.htaccess` किंवा PHP version. hPanel → PHP Configuration मध्ये 8.1 आहे का बघा. मग `logs/php-error.log` File Manager मधून उघडून खरी चूक बघा. |
 | **"Service temporarily unavailable"** | Database credentials चुकीचे. `config/db.local.php` तपासा — विशेषतः database name मध्ये `u123456789_` prefix आहे का. |
-| **पांढरी रिकामी screen** | PHP fatal error. `config/config.php` मध्ये तात्पुरतं `'development'` करा, error वाचा, दुरुस्त करा, परत `'production'` करा. |
+| **पांढरी रिकामी screen** | PHP fatal error. `logs/php-error.log` उघडून बघा. जास्त तपशील हवा असेल तर तात्पुरती `config/env.php` बनवा (Step 5), error वाचा, **मग ती file delete करा**. |
 | **Redirect loop (ERR_TOO_MANY_REDIRECTS)** | SSL अजून install झालेलं नाही. Step 7 पूर्ण करा. तातडीचं असेल तर `.htaccess` मधला "Force HTTPS" block तात्पुरता comment करा (`#` लावा). |
 | **CSS लागत नाही / page फुटलेलं दिसतं** | `assets/` folder upload झालं नाही, किंवा permission चुकीची. `assets/css/re360.css` browser मध्ये direct उघडून बघा. |
 | **Upload होत नाही** | `uploads/` ची permission `755` करा. File 10 MB पेक्षा मोठी असेल तर `.user.ini` मधली limit वाढवा (बदल लागू व्हायला ५ मिनिटं लागतात). |

@@ -4,9 +4,29 @@
  * Real Estate Channel Partner Operating System
  */
 
-// ---- Error reporting (turn off display in production on Hostinger) ----
+// ---- Environment ----
+// This file is tracked by git, so a value edited here is wiped by the next
+// `git pull` — and the site would silently fall back to showing raw errors.
+// So the mode is decided the other way round: production unless we can see
+// that this is a local machine. Override explicitly in config/env.php
+// (never committed) if you need to.
 if (!defined('RE360_ENV')) {
-    define('RE360_ENV', 'development'); // change to 'production' on Hostinger
+    $RE360_ENV = null;
+
+    if (is_file(__DIR__ . '/env.php')) {
+        require __DIR__ . '/env.php';   // sets $RE360_ENV = 'development' | 'production'
+    }
+
+    if ($RE360_ENV !== 'development' && $RE360_ENV !== 'production') {
+        $h = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+        $h = explode(':', $h)[0];       // drop :8080 and friends
+        $isLocal = $h === '' || $h === 'localhost' || $h === '127.0.0.1' || $h === '::1'
+                || str_ends_with($h, '.local') || str_ends_with($h, '.test')
+                || str_ends_with($h, '.localhost');
+        $RE360_ENV = $isLocal ? 'development' : 'production';
+    }
+
+    define('RE360_ENV', $RE360_ENV);
 }
 if (RE360_ENV === 'development') {
     error_reporting(E_ALL);

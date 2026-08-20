@@ -43,13 +43,27 @@ function field(string $label, string $name, $value = '', string $type = 'text', 
          . '<input class="field-input" type="' . $type . '" name="' . e($name) . '" value="' . e($value) . '"' . $a . '></div>';
 }
 
-/** Render a labelled select */
+/** Render a labelled select
+ *
+ * Two shapes are accepted:
+ *   ['1 BHK', '2 BHK']        plain list  → the label is also the value
+ *   [7 => 'Sunrise Heights']  keyed map   → the key is the value
+ *
+ * The distinction has to be "is this a list?", not "is the key an integer".
+ * Every id => name map built from the database (builders, projects, clients,
+ * flats) has integer keys, so an is_int() test would post the *name* where a
+ * foreign key id is expected and the insert would fail on the constraint.
+ */
 function select_field(string $label, string $name, array $options, $selected = '', bool $allowEmpty = false): string
 {
+    $isList = function_exists('array_is_list')
+        ? array_is_list($options)
+        : ($options === [] || array_keys($options) === range(0, count($options) - 1));
+
     $h = '<div class="form-group"><label>' . e($label) . '</label><select class="select" name="' . e($name) . '">';
     if ($allowEmpty) $h .= '<option value="">— Select —</option>';
     foreach ($options as $val => $lbl) {
-        if (is_int($val)) $val = $lbl;                 // simple list
+        if ($isList) $val = $lbl;
         $sel = ((string)$selected === (string)$val) ? ' selected' : '';
         $h .= '<option value="' . e($val) . '"' . $sel . '>' . e($lbl) . '</option>';
     }

@@ -15,7 +15,7 @@ permissions, health check, backup, troubleshooting सगळं तिथे आ
 2. **MySQL database** बनवा (hPanel → Databases)
 3. **Files** `public_html/` मध्ये टाका (File Manager / Git / FTP)
 4. `config/db.sample.php` ची copy `config/db.local.php` बनवून credentials भरा
-5. `config/config.php` मध्ये `RE360_ENV` = `'production'` करा
+5. Production mode आपोआप — domain वर असेल तर production, localhost वर development
 6. `uploads/` आणि `logs/` ला permission **755** द्या
 7. **SSL** चालू करा (hPanel → Security → SSL) — हे setup च्या आधी करा
 8. `https://yourdomain.com/tools/healthcheck.php` उघडून सगळं हिरवं आहे का बघा
