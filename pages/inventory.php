@@ -62,7 +62,7 @@ require __DIR__ . '/../includes/header.php';
   <div class="kpi"><div class="top"><div class="ic-box pink"><?= icon('refresh',20) ?></div><div class="k-label">Stale (&gt;15 days)</div></div><div class="k-value"><?= number_format($sumStale) ?></div></div>
 </div>
 
-<form class="card" style="margin-bottom:18px;padding:14px" method="get">
+<form class="card" style="margin-bottom:18px;padding:14px" method="get" data-autofilter>
   <input type="hidden" name="page" value="inventory">
   <div style="display:flex;gap:10px;flex-wrap:wrap">
     <div class="search" style="flex:1;min-width:200px;background:var(--bg-card-2)">

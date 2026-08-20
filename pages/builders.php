@@ -19,7 +19,7 @@ require __DIR__ . '/../includes/header.php';
   <a class="btn primary" href="<?= url('builder_form') ?>"><?= icon('plus',16) ?> Add Builder</a>
 </div>
 
-<form class="card" style="margin-bottom:18px;padding:12px" method="get">
+<form class="card" style="margin-bottom:18px;padding:12px" method="get" data-autofilter>
   <input type="hidden" name="page" value="builders">
   <div class="search" style="max-width:none;background:var(--bg-card-2)">
     <?= icon('search',18) ?>

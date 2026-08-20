@@ -31,7 +31,7 @@ require __DIR__ . '/../includes/header.php';
   <a class="btn primary" href="<?= url('project_form') ?>"><?= icon('plus',16) ?> Add Project</a>
 </div>
 
-<form class="card" style="margin-bottom:18px;padding:14px" method="get">
+<form class="card" style="margin-bottom:18px;padding:14px" method="get" data-autofilter>
   <input type="hidden" name="page" value="projects">
   <div style="display:flex;gap:10px;flex-wrap:wrap">
     <div class="search" style="flex:1;min-width:220px;background:var(--bg-card-2)">
