@@ -53,6 +53,7 @@
   --text-faint:   #3a4560;
   --overlay:      rgba(4,7,15,.66);
   --topbar-bg:    rgba(10,14,26,.82);
+  --ph-bg:        linear-gradient(135deg, #1a2544, #0e1428);
 
   color-scheme: dark;
 }
@@ -103,6 +104,7 @@
   --text-faint:   #a8b2c6;
   --overlay:      rgba(19,24,38,.38);
   --topbar-bg:    rgba(245,247,251,.82);
+  --ph-bg:        linear-gradient(135deg, #e7edf8, #d9e2f1);
 
   color-scheme: light;
 }
@@ -113,6 +115,16 @@
 :root.light .nav a.active { color: var(--primary); box-shadow: inset 0 0 0 1px rgba(91,60,232,.28); }
 :root.light .brand .logo { box-shadow: 0 6px 18px rgba(91,60,232,.28); }
 :root.light .table thead th { background: var(--bg-2); }
+
+/* Stand-in block for a project photo that has not been uploaded yet.
+   Was a hardcoded navy gradient inline on three pages, which stayed dark
+   on the light theme and read as a hole punched in the card. */
+.img-ph {
+  border-radius: 11px;
+  background: var(--ph-bg);
+  display: grid; place-items: center;
+  color: var(--text-muted);
+}
 
 /* ---------- reset ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }

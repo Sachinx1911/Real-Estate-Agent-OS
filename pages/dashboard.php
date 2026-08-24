@@ -218,7 +218,7 @@ require __DIR__ . '/../includes/header.php';
       <h3>Project Spotlight <span class="badge violet" style="margin-left:6px">Featured</span></h3>
       <a class="btn ghost sm" href="<?= url('project_view',['id'=>$feat['id']]) ?>">View Details</a>
     </div>
-    <div style="height:170px;border-radius:12px;background:linear-gradient(135deg,#1a2544,#0e1428);display:grid;place-items:center;color:var(--text-muted);margin-bottom:14px">
+    <div class="img-ph" style="height:170px;border-radius:12px;margin-bottom:14px">
       <?= icon('building',46) ?>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start">

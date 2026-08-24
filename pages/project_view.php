@@ -45,7 +45,7 @@ require __DIR__ . '/../includes/header.php';
 <!-- Hero facts -->
 <div class="card">
   <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
-    <div style="width:180px;height:110px;border-radius:11px;background:linear-gradient(135deg,#1a2544,#0e1428);display:grid;place-items:center;color:var(--text-muted)"><?= icon('building',36) ?></div>
+    <div class="img-ph" style="width:180px;height:110px;flex:0 0 180px"><?= icon('building',36) ?></div>
     <div style="flex:1;min-width:240px">
       <div class="chip-row">
         <span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':'blue') ?>"><?= $GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status'] ?></span>

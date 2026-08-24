@@ -58,7 +58,7 @@ require __DIR__ . '/../includes/header.php';
 <div class="grid" style="grid-template-columns:repeat(3,1fr)">
   <?php foreach ($projects as $p): ?>
     <a class="card" href="<?= url('project_view',['id'=>$p['id']]) ?>">
-      <div style="height:120px;border-radius:11px;background:linear-gradient(135deg,#1a2544,#0e1428);display:grid;place-items:center;color:var(--text-muted);margin-bottom:12px">
+      <div class="img-ph" style="height:120px;margin-bottom:12px">
         <?= icon('building',36) ?>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
