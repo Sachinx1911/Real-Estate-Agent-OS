@@ -36,11 +36,13 @@ $labels = ['new'=>'New','contacted'=>'Contacted','site_visit'=>'Site Visit','neg
 $colors = ['new'=>'blue','contacted'=>'violet','site_visit'=>'amber','negotiation'=>'gold','booked'=>'green','lost'=>'grey'];
 require __DIR__ . '/../includes/header.php';
 ?>
-<div class="page-head">
+<div class="page-head no-print">
   <div><h2>Leads &amp; Clients</h2><p><?= count($clients) ?> customer<?= count($clients)==1?'':'s' ?><?= $where ? ' matching your filters' : ' in your pipeline' ?></p></div>
   <div style="display:flex;gap:8px">
     <a class="btn ghost" href="api/export_clients.php<?= $exportQs ? '?'.e($exportQs) : '' ?>"
        title="Download the list below as a CSV you can open in Excel"><?= icon('export',16) ?> Export to Excel</a>
+    <button type="button" class="btn ghost" onclick="window.print()"
+            title="Print the list, or choose Save as PDF in the print dialog"><?= icon('file',16) ?> Print / PDF</button>
     <a class="btn primary" href="<?= url('client_form') ?>"><?= icon('plus',16) ?> Add Client</a>
   </div>
 </div>
@@ -72,10 +74,26 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </form>
 
+<?php
+  $activeFilters = [];
+  if ($status !== '') $activeFilters[] = 'Stage: ' . ($labels[$status] ?? $status);
+  if ($bhk    !== '') $activeFilters[] = 'BHK: ' . $bhk;
+  if ($loc    !== '') $activeFilters[] = 'Location: ' . $loc;
+  if ($q      !== '') $activeFilters[] = 'Search: ' . $q;
+?>
+<div class="print-only print-head">
+  <h1>Customer Requirement List</h1>
+  <div class="meta">
+    <?= SITE_NAME ?> &middot; <?= count($clients) ?> customer<?= count($clients)==1?'':'s' ?>
+    &middot; <?= date('d M Y') ?>
+    <?php if ($activeFilters): ?>&middot; <?= e(implode('  |  ', $activeFilters)) ?><?php endif; ?>
+  </div>
+</div>
+
 <div class="card pad0">
   <div class="table-wrap">
     <table class="data">
-      <thead><tr><th>Client</th><th>Mobile</th><th>BHK</th><th>Carpet</th><th>Location</th><th>Budget</th><th>Possession</th><th>Type</th><th>Purpose</th><th>Stage</th><th></th></tr></thead>
+      <thead><tr><th>Client</th><th>Mobile</th><th>BHK</th><th>Carpet</th><th>Location</th><th>Budget</th><th>Possession</th><th>Type</th><th>Purpose</th><th>Stage</th><th class="no-print"></th></tr></thead>
       <tbody>
       <?php foreach ($clients as $c):
         $months = (int)$c['possession_within_months'];
@@ -93,7 +111,7 @@ require __DIR__ . '/../includes/header.php';
           <td><?= e($ruc) ?></td>
           <td><?= e(ucwords(str_replace('_',' ',$c['purpose']))) ?></td>
           <td><span class="badge <?= $colors[$c['status']] ?? 'grey' ?>"><?= $labels[$c['status']] ?? $c['status'] ?></span></td>
-          <td>
+          <td class="no-print">
             <a class="link" href="<?= url('client_view',['id'=>$c['id']]) ?>">View</a> ·
             <a class="link" href="<?= url('matcher',['client'=>$c['id']]) ?>">Match →</a>
           </td>

@@ -625,3 +625,61 @@ span.ic { display: inline-flex; align-items: center; justify-content: center; fl
 #themeBtn .ic-sun  { display: inline-flex; }
 :root.light #themeBtn .ic-sun  { display: none; }
 :root.light #themeBtn .ic-moon { display: inline-flex; }
+
+/* ============================================================
+   PRINT
+   The app is dark by default; printing that as-is would flood a page with
+   ink and render badly. Print always uses black on white, regardless of the
+   theme on screen, and drops everything that is not the list itself —
+   sidebar, top bar, filters, KPI tiles and row actions.
+   ============================================================ */
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+
+  :root, :root.light {
+    --bg: #fff; --bg-2: #fff; --bg-card: #fff; --bg-card-2: #fff;
+    --bg-hover: #fff; --border: #b8bfcc; --border-soft: #d5dae3;
+    --text: #000; --text-2: #1c2230; --text-muted: #4a5262;
+    --shadow: none;
+  }
+
+  body { background: #fff; color: #000; font-size: 10.5pt; }
+
+  /* app chrome has no place on paper */
+  .sidebar, .topbar, .sidebar-backdrop, .modal-overlay,
+  .kpi-row, form.card, .pager, .no-print,
+  .page-head .btn { display: none !important; }
+
+  .app, .main { display: block; }
+  .content { padding: 0; }
+  .card { border: none; padding: 0; box-shadow: none; }
+  .table-wrap { overflow: visible; }
+
+  /* a printed table needs real rules to be readable */
+  table.data { width: 100%; border-collapse: collapse; }
+  table.data thead th {
+    background: #eef1f6 !important; color: #000; border: 1px solid #b8bfcc;
+    padding: 6px 8px; font-size: 8.5pt;
+  }
+  table.data tbody td {
+    border: 1px solid #ccd2dc; padding: 5px 8px; color: #000;
+    font-size: 9.5pt; white-space: normal;
+  }
+  table.data tbody tr { page-break-inside: avoid; }
+  thead { display: table-header-group; }   /* repeat headers on every page */
+
+  /* badges print as outlined text, not filled blocks */
+  .badge, .pill, .match-badge {
+    background: none !important; color: #000 !important;
+    border: 1px solid #98a1b0; padding: 1px 5px; font-weight: 600;
+  }
+
+  a { color: #000; text-decoration: none; }
+  .print-only { display: block !important; }
+  .print-head { margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 7px; }
+  .print-head h1 { font-size: 15pt; font-weight: 800; }
+  .print-head .meta { font-size: 9pt; color: #333; margin-top: 3px; }
+}
+
+/* only ever visible on paper */
+.print-only { display: none; }
