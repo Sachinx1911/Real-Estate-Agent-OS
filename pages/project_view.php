@@ -42,47 +42,66 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<!-- Hero facts -->
-<div class="card">
-  <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+<div class="pv-shell">
+
+  <!-- Left rail: what the project *is* — stays put while the tabs change -->
+  <aside class="pv-rail">
     <?php $hero = $p['hero_image'] ?? ''; ?>
     <?php if ($hero && is_file(BASE_PATH . '/' . $hero)): ?>
-      <img class="photo-sq" src="<?= e($hero) ?>" alt="<?= e($p['name']) ?>" style="width:180px;flex:0 0 180px">
+      <img class="photo-sq" src="<?= e($hero) ?>" alt="<?= e($p['name']) ?>">
     <?php else: ?>
-      <div class="img-ph img-sq" style="width:180px;flex:0 0 180px"><?= icon('building',36) ?></div>
+      <div class="img-ph img-sq"><?= icon('building',44) ?></div>
     <?php endif; ?>
-    <div style="flex:1;min-width:240px">
+
+    <div class="card mt">
       <div class="chip-row">
         <span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':'blue') ?>"><?= $GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status'] ?></span>
         <?php if ($p['rera_verified']): ?><span class="badge teal"><?= icon('verified',12) ?> RERA Verified</span><?php endif; ?>
         <span class="badge grey">Builder score <?= $p['builder_score'] ?>/10</span>
       </div>
-      <div class="small muted" style="margin-top:8px">MahaRERA: <strong style="color:var(--text)"><?= e($p['maharera_no'] ?: '—') ?></strong>
+      <div class="small muted" style="margin-top:10px">MahaRERA: <strong style="color:var(--text)"><?= e($p['maharera_no'] ?: '—') ?></strong>
         <?= $p['rera_reg_date'] ? ' · Registered '.fdate($p['rera_reg_date']) : '' ?></div>
       <?php if ($p['description']): ?><div class="small" style="margin-top:8px;color:var(--text-2)"><?= e($p['description']) ?></div><?php endif; ?>
     </div>
-    <div class="grid strip" style="grid-template-columns:repeat(5,1fr);gap:10px;text-align:center">
+
+    <!-- Configurations live here rather than inside Overview: they are the
+         reference you keep glancing at while reading pricing or inventory. -->
+    <div class="card pad0 mt">
+      <div class="card-head" style="padding:16px 18px"><h3>Configurations</h3></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Config</th><th>Carpet</th><th>Price</th></tr></thead>
+          <tbody>
+          <?php foreach ($configs as $c): ?>
+            <tr><td class="strong"><?= e($c['config']) ?></td>
+                <td><?= num($c['carpet_area']) ?> sq.ft.</td>
+                <td class="strong"><?= money($c['base_price']) ?></td></tr>
+          <?php endforeach; ?>
+          <?php if (!$configs): ?><tr><td colspan="3" class="center muted" style="padding:22px">No configurations added.</td></tr><?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right column: the numbers, then the tabbed detail -->
+  <div class="pv-main">
+    <div class="pv-stats">
       <?php foreach ([['Towers',$p['total_towers']],['Units',$p['total_units']],['Available',$stats['available']],['Hold',$stats['hold']],['Sold',$stats['sold']]] as $s): ?>
-        <div class="card" style="background:var(--bg-card-2);padding:10px">
-          <div style="font-size:17px;font-weight:800"><?= num($s[1]) ?></div><div class="muted tiny"><?= $s[0] ?></div>
-        </div>
+        <div class="card"><div class="pv-stat-n"><?= num($s[1]) ?></div><div class="muted tiny"><?= $s[0] ?></div></div>
       <?php endforeach; ?>
     </div>
-  </div>
-</div>
 
-<!-- Tabs -->
-<div class="tabs mt">
-  <?php foreach ($tabs as $k=>$lbl): ?>
-    <a href="<?= url('project_view',['id'=>$id,'tab'=>$k]) ?>" class="<?= $tab===$k?'active':'' ?>"><?= e($lbl) ?></a>
-  <?php endforeach; ?>
-</div>
+    <div class="tabs mt">
+      <?php foreach ($tabs as $k=>$lbl): ?>
+        <a href="<?= url('project_view',['id'=>$id,'tab'=>$k]) ?>" class="<?= $tab===$k?'active':'' ?>"><?= e($lbl) ?></a>
+      <?php endforeach; ?>
+    </div>
 
 <?php if ($tab === 'overview'): ?>
-  <div class="grid" style="grid-template-columns:1.3fr 1fr">
-    <div class="card">
+  <div class="card">
       <div class="card-head"><h3>Project Information</h3></div>
-      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:16px">
         <?php foreach ([
           ['Type', ucfirst($p['type'])], ['Status', $GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status']],
           ['Location', $p['node'].($p['sector']?', Sector '.$p['sector']:'')], ['Pincode', $p['pincode']],
@@ -94,22 +113,6 @@ require __DIR__ . '/../includes/header.php';
           <div><div class="muted tiny"><?= e($f[0]) ?></div><div style="font-size:13px;font-weight:600;margin-top:2px"><?= e($f[1] ?: '—') ?></div></div>
         <?php endforeach; ?>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><h3>Configurations</h3></div>
-      <div class="table-wrap">
-        <table class="data">
-          <thead><tr><th>Config</th><th>Carpet</th><th>Floors</th><th>Units</th><th>Price</th></tr></thead>
-          <tbody>
-          <?php foreach ($configs as $c): ?>
-            <tr><td class="strong"><?= e($c['config']) ?></td><td><?= num($c['carpet_area']) ?> sq.ft.</td>
-                <td><?= e($c['floor_range']) ?></td><td><?= (int)$c['unit_count'] ?></td><td class="strong"><?= money($c['base_price']) ?></td></tr>
-          <?php endforeach; ?>
-          <?php if (!$configs): ?><tr><td colspan="5" class="center muted" style="padding:24px">No configurations added.</td></tr><?php endif; ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
   </div>
   <?php if ($towers): ?>
   <div class="card mt">
@@ -281,5 +284,8 @@ require __DIR__ . '/../includes/header.php';
     </div>
   </div>
 <?php endif; ?>
+
+  </div><!-- /.pv-main -->
+</div><!-- /.pv-shell -->
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

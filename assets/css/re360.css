@@ -393,6 +393,41 @@ input, select, textarea { font-family: inherit; }
 .btn.sm { height: var(--field-h-sm); padding: 0 11px; font-size: 12px; gap: 6px; }
 
 /* Tabs */
+/* ---------- Project page shell ----------
+   Left rail carries the project's identity — photo, status, configurations —
+   and stays visible while the right column switches tabs, so you never lose
+   sight of which project you are reading. The rail sticks on tall screens
+   because the tab panels (inventory, pricing) scroll far past it. */
+.pv-shell {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.pv-rail { position: sticky; top: 18px; }
+.pv-main { min-width: 0; }          /* lets wide tables scroll instead of stretching the grid */
+
+.pv-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  text-align: center;
+}
+.pv-stats .card { padding: 14px 10px; background: var(--bg-card-2); }
+.pv-stat-n { font-size: 21px; font-weight: 800; line-height: 1.2; }
+
+/* Below ~1200px the rail is too narrow to be useful beside the tables, so it
+   goes back to a single column with the photo on top. */
+@media (max-width: 1200px) {
+  .pv-shell { grid-template-columns: 1fr; }
+  .pv-rail { position: static; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .pv-rail > .mt { margin-top: 0; }
+}
+@media (max-width: 760px) {
+  .pv-rail { grid-template-columns: 1fr; }
+  .pv-stats { grid-template-columns: repeat(3, 1fr); }
+}
+
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border-soft); margin-bottom: 16px; overflow-x: auto; }
 .tabs a, .tabs button { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-muted);
   border-bottom: 2px solid transparent; white-space: nowrap; }
