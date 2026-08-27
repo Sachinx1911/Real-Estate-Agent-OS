@@ -58,9 +58,11 @@ require __DIR__ . '/../includes/header.php';
 <div class="grid" style="grid-template-columns:repeat(3,1fr)">
   <?php foreach ($projects as $p): ?>
     <a class="card" href="<?= url('project_view',['id'=>$p['id']]) ?>">
-      <div class="img-ph" style="height:120px;margin-bottom:12px">
-        <?= icon('building',36) ?>
-      </div>
+      <?php if (!empty($p['hero_image']) && is_file(BASE_PATH . '/' . $p['hero_image'])): ?>
+        <img class="photo-sq" src="<?= e($p['hero_image']) ?>" alt="<?= e($p['name']) ?>" style="margin-bottom:12px">
+      <?php else: ?>
+        <div class="img-ph img-sq" style="margin-bottom:12px"><?= icon('building',36) ?></div>
+      <?php endif; ?>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div>
           <div style="font-weight:700;font-size:15px"><?= e($p['name']) ?></div>

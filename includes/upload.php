@@ -12,8 +12,10 @@
  */
 
 const RE360_IMG_MAX_BYTES = 8 * 1024 * 1024;  // what we accept from the browser
+// Square on both sides: project photos are shown in 1:1 slots, so a tall or
+// square original must keep its resolution rather than be capped at 4:3.
 const RE360_IMG_MAX_W     = 1600;             // what we keep on disk
-const RE360_IMG_MAX_H     = 1200;
+const RE360_IMG_MAX_H     = 1600;
 const RE360_IMG_QUALITY   = 82;
 
 /**

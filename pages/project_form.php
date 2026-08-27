@@ -74,7 +74,7 @@ require __DIR__ . '/../includes/header.php';
       <?php $cur = $v('hero_image'); ?>
       <?php if ($cur && is_file(BASE_PATH . '/' . $cur)): ?>
         <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:10px">
-          <img src="<?= e($cur) ?>" alt="" style="width:170px;height:110px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">
+          <img class="photo-sq" src="<?= e($cur) ?>" alt="" style="width:150px;flex:0 0 150px">
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;padding-top:4px">
             <input type="checkbox" name="remove_hero_image" value="1"> Remove this image
           </label>
@@ -83,6 +83,8 @@ require __DIR__ . '/../includes/header.php';
       <input class="field-input" type="file" name="hero_image_file" accept="image/*">
       <p class="muted tiny" style="margin-top:6px">
         JPG, PNG or WebP, up to 8 MB. Large photos are resized automatically.
+        Shown as a square, so a 1:1 image crops best — anything wider or taller
+        is centre-cropped.
         <?= $cur ? 'Choosing a new file replaces the current one.' : '' ?>
       </p>
     </div>

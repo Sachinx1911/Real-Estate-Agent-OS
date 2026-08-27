@@ -42,14 +42,15 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<?php if (!empty($p['hero_image']) && is_file(BASE_PATH . '/' . $p['hero_image'])): ?>
-  <img src="<?= e($p['hero_image']) ?>" alt="<?= e($p['name']) ?>" class="hero-photo">
-<?php endif; ?>
-
 <!-- Hero facts -->
 <div class="card">
   <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
-    <div class="img-ph" style="width:180px;height:110px;flex:0 0 180px"><?= icon('building',36) ?></div>
+    <?php $hero = $p['hero_image'] ?? ''; ?>
+    <?php if ($hero && is_file(BASE_PATH . '/' . $hero)): ?>
+      <img class="photo-sq" src="<?= e($hero) ?>" alt="<?= e($p['name']) ?>" style="width:180px;flex:0 0 180px">
+    <?php else: ?>
+      <div class="img-ph img-sq" style="width:180px;flex:0 0 180px"><?= icon('building',36) ?></div>
+    <?php endif; ?>
     <div style="flex:1;min-width:240px">
       <div class="chip-row">
         <span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':'blue') ?>"><?= $GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status'] ?></span>

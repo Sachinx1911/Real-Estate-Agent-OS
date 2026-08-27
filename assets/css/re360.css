@@ -126,6 +126,23 @@
   color: var(--text-muted);
 }
 
+/* Project photos come in every shape — a wide screenshot, a portrait phone
+   shot, a square render. Locking the slot to 1:1 and cropping to fill keeps
+   the cards on a straight grid instead of stepping up and down the page.
+   .img-sq is the empty state, .photo-sq the filled one; both are square so
+   the layout does not move when an image is added. */
+.img-sq, .photo-sq {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: 11px;
+}
+.photo-sq {
+  object-fit: cover;
+  display: block;
+  background: var(--ph-bg);
+  border: 1px solid var(--border);
+}
+
 /* ---------- reset ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
@@ -431,14 +448,7 @@ table.data tbody td.strong { color: var(--text); font-weight: 600; }
 .rank-no { width: 22px; font-weight: 800; color: var(--text-muted); }
 .rank-thumb { width: 38px; height: 38px; border-radius: 9px; object-fit: cover; background: var(--bg-hover); }
 
-/* Project cover photo. Fixed height so a portrait phone shot cannot push the
-   whole page down; object-fit crops rather than stretches. */
-.hero-photo {
-  width: 100%; height: 260px; object-fit: cover;
-  border-radius: var(--radius); border: 1px solid var(--border);
-  margin-bottom: 18px; display: block; background: var(--bg-card-2);
-}
-@media (max-width: 700px) { .hero-photo { height: 170px; } }
+
 
 /* Feed item */
 .feed-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-soft); align-items: flex-start; }
