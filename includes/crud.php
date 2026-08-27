@@ -76,3 +76,116 @@ function textarea_field(string $label, string $name, $value = '', string $placeh
     return '<div class="form-group full"><label>' . e($label) . '</label>'
          . '<textarea name="' . e($name) . '" placeholder="' . e($placeholder) . '">' . e($value) . '</textarea></div>';
 }
+
+/* ============================================================
+   Deleting builders and projects
+   ------------------------------------------------------------
+   The schema cascades hard: removing a project takes its inventory,
+   configurations, towers, pricing, payment plans, offers, amenity links,
+   parking, legal docs and bookings with it. Removing a builder does that
+   for every one of its projects.
+
+   Two things the database will not do for us:
+     - documents rows are linked by (entity_type, entity_id), not a foreign
+       key, so they would survive as orphans pointing at nothing — along with
+       the uploaded files on disk.
+     - site_visits.project_id has no foreign key, so a visit would keep an id
+       that no longer resolves. The visit belongs to the client, not the
+       project, so the reference is cleared instead of deleting the record.
+   ============================================================ */
+
+/** Bookings recorded against a project — the reason a delete may be refused. */
+function project_booking_count(int $projectId): int
+{
+    return (int) scalar("SELECT COUNT(*) FROM bookings WHERE project_id=?", [$projectId]);
+}
+
+/** Bookings across every project of a builder. */
+function builder_booking_count(int $builderId): int
+{
+    return (int) scalar(
+        "SELECT COUNT(*) FROM bookings b JOIN projects p ON p.id=b.project_id WHERE p.builder_id=?",
+        [$builderId]
+    );
+}
+
+/** What a project delete would take with it, for the confirmation message. */
+function project_delete_summary(int $projectId): array
+{
+    return [
+        'flats'    => (int) scalar("SELECT COUNT(*) FROM inventory WHERE project_id=?", [$projectId]),
+        'configs'  => (int) scalar("SELECT COUNT(*) FROM project_configurations WHERE project_id=?", [$projectId]),
+        'towers'   => (int) scalar("SELECT COUNT(*) FROM towers WHERE project_id=?", [$projectId]),
+        'docs'     => (int) scalar("SELECT COUNT(*) FROM documents WHERE entity_type='project' AND entity_id=?", [$projectId]),
+        'bookings' => project_booking_count($projectId),
+    ];
+}
+
+/** Remove the things no foreign key covers, then let the cascade do the rest. */
+function purge_project_extras(int $projectId): void
+{
+    require_once __DIR__ . '/upload.php';
+
+    foreach (rows("SELECT file_path FROM documents WHERE entity_type='project' AND entity_id=?", [$projectId]) as $d) {
+        delete_upload($d['file_path']);
+    }
+    db()->prepare("DELETE FROM documents WHERE entity_type='project' AND entity_id=?")->execute([$projectId]);
+
+    $hero = scalar("SELECT hero_image FROM projects WHERE id=?", [$projectId]);
+    if ($hero) delete_upload($hero);
+
+    db()->prepare("UPDATE site_visits SET project_id=NULL WHERE project_id=?")->execute([$projectId]);
+}
+
+/**
+ * Delete one project.
+ * @return array{ok:bool, error?:string}
+ */
+function delete_project(int $projectId): array
+{
+    $p = row("SELECT id, name FROM projects WHERE id=?", [$projectId]);
+    if (!$p) return ['ok' => false, 'error' => 'That project no longer exists.'];
+
+    $bookings = project_booking_count($projectId);
+    if ($bookings > 0) {
+        return ['ok' => false, 'error' =>
+            "This project has {$bookings} booking(s) against it. Deleting it would erase those sales records too. "
+            . "Remove the bookings first if you really want it gone."];
+    }
+
+    purge_project_extras($projectId);
+    db()->prepare("DELETE FROM projects WHERE id=?")->execute([$projectId]);
+    log_activity('project_deleted', 'project', null, 'Project deleted – ' . $p['name'], 'building');
+    return ['ok' => true];
+}
+
+/**
+ * Delete one builder and everything under it.
+ * @return array{ok:bool, error?:string}
+ */
+function delete_builder(int $builderId): array
+{
+    $b = row("SELECT id, name FROM builders WHERE id=?", [$builderId]);
+    if (!$b) return ['ok' => false, 'error' => 'That builder no longer exists.'];
+
+    $bookings = builder_booking_count($builderId);
+    if ($bookings > 0) {
+        return ['ok' => false, 'error' =>
+            "This builder's projects carry {$bookings} booking(s). Deleting it would erase those sales records too. "
+            . "Remove the bookings first if you really want it gone."];
+    }
+
+    foreach (rows("SELECT id FROM projects WHERE builder_id=?", [$builderId]) as $p) {
+        purge_project_extras((int)$p['id']);
+    }
+    // Documents filed against the builder itself, not its projects
+    require_once __DIR__ . '/upload.php';
+    foreach (rows("SELECT file_path FROM documents WHERE entity_type='builder' AND entity_id=?", [$builderId]) as $d) {
+        delete_upload($d['file_path']);
+    }
+    db()->prepare("DELETE FROM documents WHERE entity_type='builder' AND entity_id=?")->execute([$builderId]);
+
+    db()->prepare("DELETE FROM builders WHERE id=?")->execute([$builderId]);
+    log_activity('builder_deleted', 'builder', null, 'Builder deleted – ' . $b['name'], 'building');
+    return ['ok' => true];
+}

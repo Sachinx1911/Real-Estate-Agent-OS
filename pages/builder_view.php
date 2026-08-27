@@ -1,13 +1,22 @@
 <?php
 /** RE360 — Builder profile */
 require_once __DIR__ . '/../includes/icons.php';
+require_once __DIR__ . '/../includes/crud.php';
 $page = 'builders'; $pageTitle = 'Builder Profile';
+$err = '';
 
 $id = (int)($_GET['id'] ?? 0);
 $b = row("SELECT * FROM builders WHERE id=?", [$id]);
 if (!$b) { require __DIR__ . '/../includes/header.php'; echo '<div class="card empty">Builder not found.</div>'; require __DIR__ . '/../includes/footer.php'; return; }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_builder') {
+    $res = delete_builder($id);
+    if ($res['ok']) { header('Location: ' . url('builders')); exit; }
+    $err = $res['error'];
+}
+
 $projects = rows("SELECT * FROM projects WHERE builder_id=? ORDER BY name", [$id]);
+$bkCount  = builder_booking_count($id);
 $cp = row("SELECT * FROM cp_details WHERE builder_id=? LIMIT 1", [$id]);
 $scores = [
   'Construction'  => (float)$b['score_construction'],
@@ -20,6 +29,7 @@ $scores = [
 $avg = round(array_sum($scores)/6, 1);
 require __DIR__ . '/../includes/header.php';
 ?>
+<?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 <div class="page-head">
   <div>
     <h2><?= e($b['name']) ?></h2>
@@ -28,6 +38,16 @@ require __DIR__ . '/../includes/header.php';
   <div style="display:flex;gap:8px">
     <a class="btn ghost" href="<?= url('builders') ?>">← Back</a>
     <a class="btn primary" href="<?= url('builder_form',['id'=>$b['id']]) ?>">Edit Builder</a>
+    <?php if ($bkCount): ?>
+      <button class="btn ghost" type="button" disabled style="opacity:.45;cursor:not-allowed"
+              title="<?= (int)$bkCount ?> booking(s) exist under this builder's projects">Delete</button>
+    <?php else: ?>
+      <form method="post" style="display:inline" onsubmit="return confirm('Delete <?= e(addslashes($b['name'])) ?>?\n\nThis also deletes <?= count($projects) ?> project(s) and everything under them — inventory, configurations, towers, pricing, offers, legal documents and uploaded files.\n\nThis cannot be undone.')">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="delete_builder">
+        <button class="btn ghost" type="submit" style="color:var(--red)">Delete</button>
+      </form>
+    <?php endif; ?>
   </div>
 </div>
 

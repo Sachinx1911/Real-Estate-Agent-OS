@@ -1,6 +1,8 @@
 <?php
 /** RE360 — Project detail with tabs (the sales card view) */
 require_once __DIR__ . '/../includes/icons.php';
+require_once __DIR__ . '/../includes/crud.php';
+$err = '';
 $page = 'projects'; $pageTitle = 'Project Details';
 
 $id  = (int)($_GET['id'] ?? 0);
@@ -9,6 +11,13 @@ $p = row("SELECT p.*, b.name AS builder_name, b.id AS bid,
             ROUND((b.score_construction+b.score_delivery+b.score_location+b.score_pricing+b.score_reputation+b.score_documentation)/6,1) AS builder_score
           FROM projects p JOIN builders b ON b.id=p.builder_id WHERE p.id=?", [$id]);
 if (!$p) { require __DIR__ . '/../includes/header.php'; echo '<div class="card empty">Project not found.</div>'; require __DIR__ . '/../includes/footer.php'; return; }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_project') {
+    $res = delete_project($id);
+    if ($res['ok']) { header('Location: ' . url('projects')); exit; }
+    $err = $res['error'];
+}
+$del = project_delete_summary($id);
 
 $configs = rows("SELECT * FROM project_configurations WHERE project_id=? ORDER BY carpet_area", [$id]);
 $towers  = rows("SELECT * FROM towers WHERE project_id=? ORDER BY name", [$id]);
@@ -30,6 +39,7 @@ $weaknesses = array_filter(array_map('trim', explode("\n", $p['weaknesses'] ?? '
 $tabs = ['overview'=>'Overview','inventory'=>'Inventory ('.$stats['available'].')','pricing'=>'Pricing','amenities'=>'Amenities','location'=>'Location','legal'=>'Legal / RERA','sales'=>'Sales Intelligence'];
 require __DIR__ . '/../includes/header.php';
 ?>
+<?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 <div class="page-head">
   <div>
     <h2><?= e($p['name']) ?> <?php if ($p['is_featured']): ?><span class="badge violet">Featured</span><?php endif; ?></h2>
@@ -39,6 +49,16 @@ require __DIR__ . '/../includes/header.php';
     <a class="btn ghost" href="<?= url('projects') ?>">← Back</a>
     <a class="btn ghost" href="<?= url('inventory_form',['project'=>$p['id']]) ?>"><?= icon('plus',15) ?> Add Inventory</a>
     <a class="btn primary" href="<?= url('project_form',['id'=>$p['id']]) ?>">Edit</a>
+    <?php if ($del['bookings']): ?>
+      <button class="btn ghost" type="button" disabled style="opacity:.45;cursor:not-allowed"
+              title="<?= (int)$del['bookings'] ?> booking(s) recorded against this project">Delete</button>
+    <?php else: ?>
+      <form method="post" style="display:inline" onsubmit="return confirm('Delete <?= e(addslashes($p['name'])) ?>?\n\nAlso deleted: <?= $del['flats'] ?> flat(s), <?= $del['configs'] ?> configuration(s), <?= $del['towers'] ?> tower(s), <?= $del['docs'] ?> document(s), plus pricing, offers and legal records.\n\nThis cannot be undone.')">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="delete_project">
+        <button class="btn ghost" type="submit" style="color:var(--red)">Delete</button>
+      </form>
+    <?php endif; ?>
   </div>
 </div>
 
