@@ -9,7 +9,38 @@ $msg = ''; $err = '';
 $stageToInvStatus = ['token'=>'token','booked'=>'booked','agreement'=>'agreement','registered'=>'registered'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!empty($_POST['update_stage']) && !empty($_POST['booking_id'])) {
+    if (($_POST['action'] ?? '') === 'delete_booking' && !empty($_POST['booking_id'])) {
+        $bid = (int)$_POST['booking_id'];
+        $bk  = row("SELECT b.*, c.name AS cname, p.name AS pname FROM bookings b
+                    JOIN clients c ON c.id=b.client_id JOIN projects p ON p.id=b.project_id
+                    WHERE b.id=?", [$bid]);
+        if (!$bk) {
+            $err = 'That booking no longer exists.';
+        } else {
+            db()->prepare("DELETE FROM bookings WHERE id=?")->execute([$bid]);
+
+            /* The booking is what put this flat out of circulation. With the
+             * booking gone the flat has to go back on the market, or it stays
+             * marked sold forever with nothing behind it. */
+            if ($bk['flat_id']) {
+                db()->prepare("UPDATE inventory SET status='available', last_verified_at=NOW(), verified_by=? WHERE id=?")
+                    ->execute([current_user()['id'] ?? null, $bk['flat_id']]);
+            }
+
+            /* Same for the client: only step them back if this was their last
+             * booking — someone who booked twice is still a buyer. */
+            $left = (int) scalar("SELECT COUNT(*) FROM bookings WHERE client_id=?", [$bk['client_id']]);
+            if ($left === 0) {
+                db()->prepare("UPDATE clients SET status='negotiation' WHERE id=?")->execute([$bk['client_id']]);
+            }
+
+            log_activity('booking_deleted','project',(int)$bk['project_id'],
+                         'Booking deleted – ' . $bk['cname'] . ' / ' . $bk['pname'], 'bookings');
+            $msg = 'Booking deleted.'
+                 . ($bk['flat_id'] ? ' Flat is available again.' : '')
+                 . ($left === 0 ? ' Client moved back to Negotiation.' : '');
+        }
+    } elseif (!empty($_POST['update_stage']) && !empty($_POST['booking_id'])) {
         $bid = (int)$_POST['booking_id']; $stage = $_POST['update_stage'];
         if (isset($stageToInvStatus[$stage])) {
             db()->prepare("UPDATE bookings SET stage=? WHERE id=?")->execute([$stage, $bid]);
@@ -55,6 +86,7 @@ require __DIR__ . '/../includes/header.php';
   <div><h2>Bookings</h2><p><?= count($bookings) ?> total bookings</p></div>
 </div>
 <?php if ($msg): ?><div class="login-err" style="background:var(--green-bg);color:var(--green);margin-bottom:16px">✓ <?= e($msg) ?></div><?php endif; ?>
+<?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 
 <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
   <div class="kpi"><div class="top"><div class="ic-box teal"><?= icon('bookings',20) ?></div><div class="k-label">This Month</div></div><div class="k-value"><?= $thisMonth ?></div></div>
@@ -91,15 +123,23 @@ require __DIR__ . '/../includes/header.php';
             <td><span class="badge <?= ['token'=>'violet','booked'=>'blue','agreement'=>'teal','registered'=>'green'][$b['stage']] ?? 'grey' ?>"><?= ucfirst($b['stage']) ?></span></td>
             <td><?= fdate($b['booking_date']) ?></td>
             <td>
-              <form method="post" style="display:flex;gap:6px"><?= csrf_field() ?>
-                <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
-                <select class="select sm" name="update_stage" onchange="this.form.submit()">
-                  <option value="">Change…</option>
-                  <?php foreach (['token'=>'Token','booked'=>'Booked','agreement'=>'Agreement','registered'=>'Registered'] as $k=>$l): ?>
-                    <?php if ($k !== $b['stage']): ?><option value="<?= $k ?>"><?= $l ?></option><?php endif; ?>
-                  <?php endforeach; ?>
-                </select>
-              </form>
+              <div style="display:flex;gap:6px;align-items:center">
+                <form method="post"><?= csrf_field() ?>
+                  <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                  <select class="select sm" name="update_stage" onchange="this.form.submit()">
+                    <option value="">Change…</option>
+                    <?php foreach (['token'=>'Token','booked'=>'Booked','agreement'=>'Agreement','registered'=>'Registered'] as $k=>$l): ?>
+                      <?php if ($k !== $b['stage']): ?><option value="<?= $k ?>"><?= $l ?></option><?php endif; ?>
+                    <?php endforeach; ?>
+                  </select>
+                </form>
+                <form method="post" onsubmit="return confirm('Delete this booking?\n\n<?= e(addslashes($b['cname'])) ?> — <?= e(addslashes($b['pname'])) ?><?= $b['flat_no'] ? ' (' . e(addslashes($b['flat_no'])) . ')' : '' ?>\nValue <?= e(money($b['value'])) ?>\n\n<?= $b['flat_no'] ? 'The flat goes back to Available. ' : '' ?>This cannot be undone.')">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="action" value="delete_booking">
+                  <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                  <button class="btn ghost sm" type="submit" style="color:var(--red)">Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
         <?php endforeach; ?>
