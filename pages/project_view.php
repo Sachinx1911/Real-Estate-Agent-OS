@@ -42,6 +42,10 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
+<?php if (!empty($p['hero_image']) && is_file(BASE_PATH . '/' . $p['hero_image'])): ?>
+  <img src="<?= e($p['hero_image']) ?>" alt="<?= e($p['name']) ?>" class="hero-photo">
+<?php endif; ?>
+
 <!-- Hero facts -->
 <div class="card">
   <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">

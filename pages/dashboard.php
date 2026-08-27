@@ -197,7 +197,11 @@ require __DIR__ . '/../includes/header.php';
     <?php $rk=1; foreach ($topProjects as $tp): ?>
       <div class="rank-item">
         <span class="rank-no"><?= $rk++ ?></span>
-        <div class="rank-thumb"></div>
+        <?php if (!empty($tp['hero_image']) && is_file(BASE_PATH . '/' . $tp['hero_image'])): ?>
+          <img class="rank-thumb" src="<?= e($tp['hero_image']) ?>" alt="">
+        <?php else: ?>
+          <div class="rank-thumb"></div>
+        <?php endif; ?>
         <div style="flex:1">
           <div style="font-weight:600;font-size:13px"><?= e($tp['name']) ?></div>
           <div class="muted tiny"><?= (int)$tp['bookings'] ?> Bookings</div>

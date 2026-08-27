@@ -2,6 +2,7 @@
 /** RE360 — Add / edit project */
 require_once __DIR__ . '/../includes/icons.php';
 require_once __DIR__ . '/../includes/crud.php';
+require_once __DIR__ . '/../includes/upload.php';
 $page = 'projects'; $pageTitle = 'Project Form';
 
 $id = (int)($_GET['id'] ?? 0);
@@ -11,7 +12,7 @@ $err = '';
 $fields = ['builder_id','name','type','status','address','city','node','sector','micro_market','pincode','latitude','longitude',
   'maharera_no','rera_link','rera_reg_date','rera_verified','proposed_completion','possession_label','current_status',
   'total_towers','total_units','land_parcel','project_area','launch_date','oc_status','cc_status','delay_history',
-  'price_min','price_max','description','is_featured','best_for','budget_band','strengths','weaknesses'];
+  'price_min','price_max','description','is_featured','best_for','budget_band','strengths','weaknesses','hero_image'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (trim($_POST['name'] ?? '') === '' || empty($_POST['builder_id'])) {
@@ -19,6 +20,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $_POST['rera_verified'] = isset($_POST['rera_verified']) ? 1 : 0;
         $_POST['is_featured']   = isset($_POST['is_featured']) ? 1 : 0;
+
+        /* Image first: if it fails we stop and say so, rather than saving the
+         * project and silently dropping the picture the user just picked. */
+        $oldImage = $p['hero_image'] ?? null;
+        if (!empty($_FILES['hero_image_file']['name'])) {
+            $up = save_uploaded_image($_FILES['hero_image_file'], 'projects');
+            if (!$up['ok']) {
+                $err = $up['error'];
+            } else {
+                $_POST['hero_image'] = $up['path'];
+                delete_upload($oldImage);          // replaced — don't orphan the old file
+            }
+        } elseif (!empty($_POST['remove_hero_image'])) {
+            $_POST['hero_image'] = '';
+            delete_upload($oldImage);
+        }
+    }
+
+    if ($err === '' && trim($_POST['name'] ?? '') !== '' && !empty($_POST['builder_id'])) {
         $id = save_row('projects', $fields, $_POST, $id ?: null);
         log_activity('project_saved','project',$id,'Project saved – ' . $_POST['name'],'building');
         header('Location: ' . url('project_view', ['id'=>$id])); exit;
@@ -40,13 +60,32 @@ require __DIR__ . '/../includes/header.php';
   <div class="card empty">Add a builder first. <a class="link" href="<?= url('builder_form') ?>">Add Builder →</a></div>
 <?php else: ?>
 
-<form method="post" class="card"><?= csrf_field() ?>
+<form method="post" enctype="multipart/form-data" class="card"><?= csrf_field() ?>
   <div class="form-grid">
     <div class="form-section-title">Basic Information</div>
     <?= field('Project Name *','name',$v('name'),'text',['required'=>'required']) ?>
     <?= select_field('Builder *','builder_id',$builderOpts,$v('builder_id'),true) ?>
     <?= select_field('Type','type',['residential'=>'Residential','commercial'=>'Commercial','mixed'=>'Mixed'],$v('type','residential')) ?>
     <?= select_field('Status','status',$GLOBALS['RE360_PROJECT_STATUS'],$v('status','under_construction')) ?>
+
+    <div class="form-section-title">Project Image</div>
+    <div class="form-group full">
+      <label>Cover photo</label>
+      <?php $cur = $v('hero_image'); ?>
+      <?php if ($cur && is_file(BASE_PATH . '/' . $cur)): ?>
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:10px">
+          <img src="<?= e($cur) ?>" alt="" style="width:170px;height:110px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;padding-top:4px">
+            <input type="checkbox" name="remove_hero_image" value="1"> Remove this image
+          </label>
+        </div>
+      <?php endif; ?>
+      <input class="field-input" type="file" name="hero_image_file" accept="image/*">
+      <p class="muted tiny" style="margin-top:6px">
+        JPG, PNG or WebP, up to 8 MB. Large photos are resized automatically.
+        <?= $cur ? 'Choosing a new file replaces the current one.' : '' ?>
+      </p>
+    </div>
 
     <div class="form-section-title">Location</div>
     <?= field('Address','address',$v('address')) ?>
