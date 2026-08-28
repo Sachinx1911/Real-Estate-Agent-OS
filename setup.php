@@ -89,6 +89,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$errors) {
             } else {
                 $messages[] = 'Tables already exist — skipped schema.';
             }
+            /* Rent lives in its own file so an install done before the rent
+               module existed picks it up here rather than needing a re-import. */
+            if (!table_exists('rent_flats')) {
+                run_sql_file(__DIR__ . '/sql/rent.sql');
+                $messages[] = 'Rent tables created.';
+            }
         } catch (Throwable $e) {
             $errors[] = 'Schema import failed: ' . $e->getMessage();
         }

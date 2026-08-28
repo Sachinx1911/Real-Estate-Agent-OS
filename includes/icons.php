@@ -43,6 +43,7 @@ function icon(string $name, int $size = 18): string
         'tag'       => '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.8a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1-.6 3.2z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
         'info'      => '<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>',
         'refresh'   => '<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',
+        'key'       => '<circle cx="7.5" cy="15.5" r="4"/><path d="M10.3 12.7L20 3M17 6l2.5 2.5M14.5 8.5L17 11"/>',
         'menu'      => '<path d="M3 6h18M3 12h18M3 18h18"/>',
         'logout'    => '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
     ];

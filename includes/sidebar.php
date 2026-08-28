@@ -12,6 +12,7 @@ $nav = [
     ['leads',     'Leads & Clients', 'leads'],
     ['site_visits','Site Visits', 'visits'],
     ['bookings',  'Bookings',  'bookings'],
+    ['rent',      'Rent',      'key'],
     ['reports',   'Reports & Analytics', 'reports'],
     ['comparisons','Comparisons', 'compare'],
     ['documents', 'Documents', 'documents'],
