@@ -94,6 +94,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$errors) {
             if (!table_exists('rent_flats')) {
                 run_sql_file(__DIR__ . '/sql/rent.sql');
                 $messages[] = 'Rent tables created.';
+            } elseif (!table_exists('rent_owners')) {
+                /* An install made when Rent was just two tables. Add the rest,
+                   then lift the owner typed into each flat into its own record.
+                   Done in PHP rather than SQL because "ALTER TABLE ADD COLUMN"
+                   errors when the column is already there, and phpMyAdmin stops
+                   the whole script on that error. */
+                run_sql_file(__DIR__ . '/sql/rent.sql');
+                $messages[] = 'Rent tables upgraded.';
+            }
+            if (table_exists('rent_flats') && table_exists('rent_owners')) {
+                $hasCol = db()->query("SHOW COLUMNS FROM rent_flats LIKE 'owner_id'")->fetch();
+                if (!$hasCol) {
+                    db()->exec("ALTER TABLE rent_flats ADD COLUMN owner_id INT NULL AFTER owner_email");
+                    db()->exec("ALTER TABLE rent_flats ADD INDEX (owner_id)");
+                }
+                if ((int) scalar("SELECT COUNT(*) FROM rent_flats WHERE owner_id IS NULL") > 0) {
+                    db()->exec("INSERT INTO rent_owners (name, mobile, alt_mobile, email)
+                                SELECT MIN(owner_name), owner_mobile, MIN(owner_alt_mobile), MIN(owner_email)
+                                FROM rent_flats
+                                WHERE owner_mobile IS NOT NULL AND owner_mobile <> ''
+                                  AND owner_mobile NOT IN (SELECT mobile FROM rent_owners WHERE mobile IS NOT NULL)
+                                GROUP BY owner_mobile");
+                    db()->exec("INSERT INTO rent_owners (name)
+                                SELECT DISTINCT owner_name FROM rent_flats
+                                WHERE (owner_mobile IS NULL OR owner_mobile = '')
+                                  AND owner_name IS NOT NULL AND owner_name <> ''
+                                  AND owner_name NOT IN (SELECT name FROM rent_owners)");
+                    db()->exec("UPDATE rent_flats f JOIN rent_owners o ON o.mobile = f.owner_mobile
+                                SET f.owner_id = o.id
+                                WHERE f.owner_id IS NULL AND f.owner_mobile IS NOT NULL AND f.owner_mobile <> ''");
+                    db()->exec("UPDATE rent_flats f JOIN rent_owners o ON o.name = f.owner_name
+                                SET f.owner_id = o.id WHERE f.owner_id IS NULL");
+                    $messages[] = 'Existing flat owners moved into the Owners list.';
+                }
             }
         } catch (Throwable $e) {
             $errors[] = 'Schema import failed: ' . $e->getMessage();
