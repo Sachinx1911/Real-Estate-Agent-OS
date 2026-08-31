@@ -1,7 +1,14 @@
 <?php
 /** RE360 — Leads & Clients */
 require_once __DIR__ . '/../includes/icons.php';
+require_once __DIR__ . '/../includes/crud.php';
 $page = 'leads'; $pageTitle = 'Leads & Clients';
+$err = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_client') {
+    $res = delete_client((int)($_POST['id'] ?? 0));
+    if (!$res['ok']) $err = $res['error'];
+}
 
 $status = trim($_GET['status'] ?? '');
 $q   = trim($_GET['q'] ?? '');
@@ -16,7 +23,8 @@ $where = $w ? 'WHERE '.implode(' AND ',$w) : '';
 
 $clients = rows("SELECT c.*, r.bhk, r.preferred_location, r.alt_location, r.min_carpet,
                         r.all_in_budget, r.agreement_budget, r.loan_amount,
-                        r.possession_within_months, r.ready_or_uc
+                        r.possession_within_months, r.ready_or_uc,
+                        (SELECT COUNT(*) FROM bookings bk WHERE bk.client_id=c.id) AS booking_count
                  FROM clients c LEFT JOIN client_requirements r ON r.client_id=c.id
                  $where ORDER BY c.updated_at DESC", $params);
 
@@ -36,6 +44,7 @@ $labels = ['new'=>'New','contacted'=>'Contacted','site_visit'=>'Site Visit','neg
 $colors = ['new'=>'blue','contacted'=>'violet','site_visit'=>'amber','negotiation'=>'gold','booked'=>'green','lost'=>'grey'];
 require __DIR__ . '/../includes/header.php';
 ?>
+<?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 <div class="page-head no-print">
   <div><h2>Leads &amp; Clients</h2><p><?= count($clients) ?> customer<?= count($clients)==1?'':'s' ?><?= $where ? ' matching your filters' : ' in your pipeline' ?></p></div>
   <div style="display:flex;gap:8px">
@@ -113,7 +122,17 @@ require __DIR__ . '/../includes/header.php';
           <td><span class="badge <?= $colors[$c['status']] ?? 'grey' ?>"><?= $labels[$c['status']] ?? $c['status'] ?></span></td>
           <td class="no-print">
             <a class="link" href="<?= url('client_view',['id'=>$c['id']]) ?>">View</a> ·
-            <a class="link" href="<?= url('matcher',['client'=>$c['id']]) ?>">Match →</a>
+            <a class="link" href="<?= url('matcher',['client'=>$c['id']]) ?>">Match →</a> ·
+            <?php if ((int)$c['booking_count']): ?>
+              <span class="muted tiny" title="<?= (int)$c['booking_count'] ?> booking(s) recorded — remove them first to delete this client">Delete</span>
+            <?php else: ?>
+              <form method="post" style="display:inline" onsubmit="return confirm('Delete <?= e(addslashes($c['name'])) ?>?\n\nThis also removes their requirement, site visits and documents.\n\nThis cannot be undone.')">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="delete_client">
+                <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
+                <button type="submit" class="link" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:var(--red)">Delete</button>
+              </form>
+            <?php endif; ?>
           </td>
         </tr>
       <?php endforeach; ?>

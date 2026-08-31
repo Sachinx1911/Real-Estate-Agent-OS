@@ -189,3 +189,57 @@ function delete_builder(int $builderId): array
     log_activity('builder_deleted', 'builder', null, 'Builder deleted – ' . $b['name'], 'building');
     return ['ok' => true];
 }
+
+/* ============================================================
+   Deleting clients
+   ------------------------------------------------------------
+   client_requirements, site_visits and bookings all carry a hard
+   FOREIGN KEY ... ON DELETE CASCADE back to clients, so the database
+   removes them on its own. Documents are the one thing it will not
+   catch — they're linked by (entity_type, entity_id), not a key — so
+   their rows and uploaded files are purged explicitly, same as for
+   projects and builders.
+   ============================================================ */
+
+/** Bookings recorded against a client — the reason a delete may be refused. */
+function client_booking_count(int $clientId): int
+{
+    return (int) scalar("SELECT COUNT(*) FROM bookings WHERE client_id=?", [$clientId]);
+}
+
+/** What a client delete would take with it, for the confirmation message. */
+function client_delete_summary(int $clientId): array
+{
+    return [
+        'visits'   => (int) scalar("SELECT COUNT(*) FROM site_visits WHERE client_id=?", [$clientId]),
+        'docs'     => (int) scalar("SELECT COUNT(*) FROM documents WHERE entity_type='client' AND entity_id=?", [$clientId]),
+        'bookings' => client_booking_count($clientId),
+    ];
+}
+
+/**
+ * Delete one client.
+ * @return array{ok:bool, error?:string}
+ */
+function delete_client(int $clientId): array
+{
+    $c = row("SELECT id, name FROM clients WHERE id=?", [$clientId]);
+    if (!$c) return ['ok' => false, 'error' => 'That client no longer exists.'];
+
+    $bookings = client_booking_count($clientId);
+    if ($bookings > 0) {
+        return ['ok' => false, 'error' =>
+            "This client has {$bookings} booking(s) on record. Deleting it would erase those sales records too. "
+            . "Remove the bookings first if you really want it gone."];
+    }
+
+    require_once __DIR__ . '/upload.php';
+    foreach (rows("SELECT file_path FROM documents WHERE entity_type='client' AND entity_id=?", [$clientId]) as $d) {
+        delete_upload($d['file_path']);
+    }
+    db()->prepare("DELETE FROM documents WHERE entity_type='client' AND entity_id=?")->execute([$clientId]);
+
+    db()->prepare("DELETE FROM clients WHERE id=?")->execute([$clientId]);
+    log_activity('client_deleted', 'client', null, 'Client deleted – ' . $c['name'], 'leads');
+    return ['ok' => true];
+}

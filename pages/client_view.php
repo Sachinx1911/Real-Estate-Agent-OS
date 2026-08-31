@@ -1,11 +1,21 @@
 <?php
 /** RE360 — Client profile with requirement + matches */
 require_once __DIR__ . '/../includes/icons.php';
+require_once __DIR__ . '/../includes/crud.php';
 $page = 'leads'; $pageTitle = 'Client Profile';
+$err = '';
 
 $id = (int)($_GET['id'] ?? 0);
 $c = row("SELECT * FROM clients WHERE id=?", [$id]);
 if (!$c) { require __DIR__ . '/../includes/header.php'; echo '<div class="card empty">Client not found.</div>'; require __DIR__ . '/../includes/footer.php'; return; }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_client') {
+    $res = delete_client($id);
+    if ($res['ok']) { header('Location: ' . url('leads')); exit; }
+    $err = $res['error'];
+}
+$del = client_delete_summary($id);
+
 $r = row("SELECT * FROM client_requirements WHERE client_id=?", [$id]);
 $visits = rows("SELECT sv.*, p.name AS pname FROM site_visits sv LEFT JOIN projects p ON p.id=sv.project_id WHERE sv.client_id=? ORDER BY sv.visit_date DESC", [$id]);
 $bookings = rows("SELECT b.*, p.name AS pname FROM bookings b JOIN projects p ON p.id=b.project_id WHERE b.client_id=?", [$id]);
@@ -30,6 +40,7 @@ if ($r) {
 $statusColors = ['new'=>'blue','contacted'=>'violet','site_visit'=>'amber','negotiation'=>'gold','booked'=>'green','lost'=>'grey'];
 require __DIR__ . '/../includes/header.php';
 ?>
+<?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
 <div class="page-head">
   <div>
     <h2><?= e($c['name']) ?> <span class="badge <?= $statusColors[$c['status']] ?? 'grey' ?>"><?= e(ucwords(str_replace('_',' ',$c['status']))) ?></span></h2>
@@ -39,6 +50,16 @@ require __DIR__ . '/../includes/header.php';
     <a class="btn ghost" href="<?= url('leads') ?>">← Back</a>
     <a class="btn ghost" href="<?= url('client_form',['id'=>$c['id']]) ?>">Edit</a>
     <a class="btn primary" href="<?= url('matcher',['client'=>$c['id']]) ?>"><?= icon('search',15) ?> Find Matches</a>
+    <?php if ($del['bookings']): ?>
+      <button class="btn ghost" type="button" disabled style="opacity:.45;cursor:not-allowed"
+              title="<?= (int)$del['bookings'] ?> booking(s) recorded against this client">Delete</button>
+    <?php else: ?>
+      <form method="post" style="display:inline" onsubmit="return confirm('Delete <?= e(addslashes($c['name'])) ?>?\n\nAlso deleted: <?= $del['visits'] ?> site visit(s), <?= $del['docs'] ?> document(s), plus their requirement and budget details.\n\nThis cannot be undone.')">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="delete_client">
+        <button class="btn ghost" type="submit" style="color:var(--red)">Delete</button>
+      </form>
+    <?php endif; ?>
   </div>
 </div>
 
