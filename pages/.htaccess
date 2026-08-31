@@ -1,0 +1,3 @@
+# Page templates expect to be require()'d by index.php after auth/CSRF
+# checks — deny direct web access.
+Require all denied

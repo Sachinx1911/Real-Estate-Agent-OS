@@ -56,7 +56,11 @@ $out = fopen('php://output', 'w');
 /* PHP 8.4 deprecates fputcsv() without an explicit $escape, and the notice
    would be written straight into the download. '' is the forward-compatible
    value and also stops backslashes being treated as escapes. */
-$put = fn(array $row) => fputcsv($out, $row, ',', '"', '');
+/* A client name/location starting with =, +, -, or @ would otherwise open
+   as a live formula in Excel/Sheets — prefix it with an apostrophe so it's
+   forced to plain text. */
+$csvSafe = fn($v) => is_string($v) && $v !== '' && strpbrk($v[0], "=+-@") !== false ? "'" . $v : $v;
+$put = fn(array $row) => fputcsv($out, array_map($csvSafe, $row), ',', '"', '');
 fwrite($out, "\xEF\xBB\xBF");   // BOM so Excel reads UTF-8 (₹, Marathi names) correctly
 
 $put([
