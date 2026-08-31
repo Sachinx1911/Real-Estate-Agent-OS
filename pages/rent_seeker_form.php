@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newId = save_row('rent_seekers', $fields, $_POST, $id ?: null);
         log_activity($id ? 'rent_seeker_updated' : 'rent_seeker_added', 'rent_seeker', (int)($newId ?: $id),
             ($id ? 'Rent enquiry updated – ' : 'Looking for rent – ') . trim($_POST['name']), 'leads');
-        header('Location: ' . url('rent', ['tab' => 'seekers']));
+        header('Location: ' . url('rent', ['tab' => 'enquiries']));
         exit;
     }
 }
@@ -44,7 +44,7 @@ require __DIR__ . '/../includes/header.php';
     <h2><?= $id ? 'Edit Person' : 'Add Person Looking for Rent' ?></h2>
     <p>Who they are, and what kind of flat they want</p>
   </div>
-  <a class="btn ghost" href="<?= url('rent',['tab'=>'seekers']) ?>">&larr; Back to list</a>
+  <a class="btn ghost" href="<?= url('rent',['tab'=>'enquiries']) ?>">&larr; Back to list</a>
 </div>
 
 <?php if ($err): ?><div class="login-err" style="margin-bottom:16px"><?= e($err) ?></div><?php endif; ?>
@@ -83,7 +83,7 @@ require __DIR__ . '/../includes/header.php';
 
   <div style="display:flex;gap:10px;margin-top:20px">
     <button class="btn primary" type="submit"><?= icon('plus',16) ?> <?= $id ? 'Save Changes' : 'Add Person' ?></button>
-    <a class="btn ghost" href="<?= url('rent',['tab'=>'seekers']) ?>">Cancel</a>
+    <a class="btn ghost" href="<?= url('rent',['tab'=>'enquiries']) ?>">Cancel</a>
   </div>
 </form>
 <?php require __DIR__ . '/../includes/footer.php'; ?>
