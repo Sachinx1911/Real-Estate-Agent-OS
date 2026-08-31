@@ -43,11 +43,11 @@ require __DIR__ . '/../includes/header.php';
           <td class="strong"><a class="link" href="<?= url('builder_view',['id'=>$r['id']]) ?>"><?= e($r['name']) ?></a></td>
           <td><?= e($r['office_location']) ?></td>
           <td><?= e($r['cp_code'] ?: '—') ?></td>
-          <td class="strong"><?= $r['commission_pct'] !== null ? $r['commission_pct'].'%' : '—' ?></td>
+          <td class="strong"><?= $r['commission_pct'] !== null ? e($r['commission_pct']).'%' : '—' ?></td>
           <td><?= e($r['commission_basis'] ?: '—') ?></td>
           <td><?= e($r['payout_stage'] ?: '—') ?></td>
           <td><?= e($r['payout_timeline'] ?: '—') ?></td>
-          <td><?= $r['lead_validity_days'] ? $r['lead_validity_days'].' days' : '—' ?></td>
+          <td><?= $r['lead_validity_days'] ? e($r['lead_validity_days']).' days' : '—' ?></td>
           <td><a class="link" href="<?= url('cp_management',['builder'=>$r['id']]) ?>">Edit →</a></td>
         </tr>
       <?php endforeach; ?>

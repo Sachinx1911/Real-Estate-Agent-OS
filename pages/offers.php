@@ -57,7 +57,7 @@ require __DIR__ . '/../includes/header.php';
               <div class="muted tiny"><?= e($o['node']) ?></div></td>
             <td><span class="badge violet"><?= e($types[$o['type']] ?? $o['type']) ?></span></td>
             <td style="white-space:normal;max-width:280px"><?= e($o['details']) ?></td>
-            <td><span class="badge <?= $o['official_or_verbal']==='official'?'green':'amber' ?>"><?= ucfirst($o['official_or_verbal']) ?></span></td>
+            <td><span class="badge <?= $o['official_or_verbal']==='official'?'green':'amber' ?>"><?= e(ucfirst($o['official_or_verbal'])) ?></span></td>
             <td><?= fdate($o['valid_till']) ?><?php if ($expired): ?><div class="tiny" style="color:var(--red)">Expired</div><?php endif; ?></td>
             <td><span class="badge <?= $o['is_active'] && !$expired ? 'green':'grey' ?>"><?= $o['is_active'] ? ($expired?'Expired':'Active') : 'Inactive' ?></span></td>
             <td><form method="post"><?= csrf_field() ?><input type="hidden" name="toggle_id" value="<?= $o['id'] ?>">

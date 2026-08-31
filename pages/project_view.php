@@ -75,7 +75,7 @@ require __DIR__ . '/../includes/header.php';
 
     <div class="card mt">
       <div class="chip-row">
-        <span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':'blue') ?>"><?= $GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status'] ?></span>
+        <span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':'blue') ?>"><?= e($GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status']) ?></span>
         <?php if ($p['rera_verified']): ?><span class="badge teal"><?= icon('verified',12) ?> RERA Verified</span><?php endif; ?>
         <span class="badge grey">Builder score <?= $p['builder_score'] ?>/10</span>
       </div>

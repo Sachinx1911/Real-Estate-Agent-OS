@@ -60,7 +60,7 @@ require __DIR__ . '/../includes/header.php';
           ['Builder',      fn($s)=>e($s['builder_name'])],
           ['Builder Score',fn($s)=>'<span class="badge '.($s['builder_score']>=8?'green':($s['builder_score']>=7?'amber':'grey')).'">'.$s['builder_score'].'/10</span>'],
           ['Location',     fn($s)=>e($s['node'].($s['sector']?', Sector '.$s['sector']:''))],
-          ['Status',       fn($s)=>'<span class="badge '.($s['status']==='ready'?'green':'blue').'">'.($GLOBALS['RE360_PROJECT_STATUS'][$s['status']] ?? $s['status']).'</span>'],
+          ['Status',       fn($s)=>'<span class="badge '.($s['status']==='ready'?'green':'blue').'">'.e($GLOBALS['RE360_PROJECT_STATUS'][$s['status']] ?? $s['status']).'</span>'],
           ['Possession',   fn($s)=>e($s['possession_label'] ?: '—')],
           ['Configurations',fn($s)=>e($s['configs'] ?: '—')],
           ['Carpet Range', fn($s)=>$s['min_carpet'] ? num($s['min_carpet']).'–'.num($s['max_carpet']).' sq.ft.'

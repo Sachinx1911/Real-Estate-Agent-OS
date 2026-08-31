@@ -120,7 +120,7 @@ require __DIR__ . '/../includes/header.php';
             <td><?= e($b['pname']) ?></td>
             <td><?= e($b['flat_no'] ?: '—') ?></td>
             <td class="strong"><?= money($b['value']) ?></td>
-            <td><span class="badge <?= ['token'=>'violet','booked'=>'blue','agreement'=>'teal','registered'=>'green'][$b['stage']] ?? 'grey' ?>"><?= ucfirst($b['stage']) ?></span></td>
+            <td><span class="badge <?= ['token'=>'violet','booked'=>'blue','agreement'=>'teal','registered'=>'green'][$b['stage']] ?? 'grey' ?>"><?= e(ucfirst($b['stage'])) ?></span></td>
             <td><?= fdate($b['booking_date']) ?></td>
             <td>
               <div style="display:flex;gap:6px;align-items:center">

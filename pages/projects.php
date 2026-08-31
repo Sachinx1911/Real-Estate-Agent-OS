@@ -72,7 +72,7 @@ require __DIR__ . '/../includes/header.php';
       </div>
       <div class="muted small" style="margin-top:6px"><?= icon('location',12) ?> <?= e($p['node']) ?><?= $p['sector'] ? ', Sector '.e($p['sector']) : '' ?></div>
       <div class="chip-row" style="margin-top:10px">
-        <span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':($p['status']==='upcoming'?'gold':'blue')) ?>"><?= $GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status'] ?></span>
+        <span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':($p['status']==='upcoming'?'gold':'blue')) ?>"><?= e($GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status']) ?></span>
         <?php if ($p['rera_verified']): ?><span class="badge teal">RERA</span><?php endif; ?>
         <span class="badge grey"><?= (int)$p['avail'] ?> available</span>
       </div>

@@ -69,7 +69,7 @@ require __DIR__ . '/../includes/header.php';
             <?= $t['due_at'] ? fdate($t['due_at'],'d M Y, g:i A') : 'No due date' ?><?= $isOverdue ? ' · Overdue' : '' ?>
           </div>
         </div>
-        <span class="badge <?= $pc ?>"><?= ucfirst($t['priority']) ?></span>
+        <span class="badge <?= $pc ?>"><?= e(ucfirst($t['priority'])) ?></span>
         <?php if ($t['status']==='open'): ?>
           <form method="post" style="display:inline"><?= csrf_field() ?><input type="hidden" name="done_id" value="<?= $t['id'] ?>">
             <button class="btn ghost sm" type="submit">Done</button></form>

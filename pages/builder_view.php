@@ -116,7 +116,7 @@ require __DIR__ . '/../includes/header.php';
         <tr>
           <td class="strong"><?= e($p['name']) ?></td>
           <td><?= e($p['node']) ?></td>
-          <td><span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':'blue') ?>"><?= $GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status'] ?></span></td>
+          <td><span class="badge <?= $p['status']==='ready'?'green':($p['status']==='new_launch'?'violet':'blue') ?>"><?= e($GLOBALS['RE360_PROJECT_STATUS'][$p['status']] ?? $p['status']) ?></span></td>
           <td><?= e($p['possession_label']) ?></td>
           <td><?= money($p['price_min']) ?> – <?= money($p['price_max']) ?></td>
           <td><?= (int)$p['total_units'] ?></td>
