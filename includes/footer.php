@@ -14,7 +14,7 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="<?= asset('assets/js/vendor/chart.umd.min.js') ?>"></script>
 <script src="<?= asset('assets/js/app.js') ?>"></script>
 <?php if (!empty($pageScripts)) foreach ((array)$pageScripts as $s): ?>
 <script src="<?= e($s) ?>"></script>

@@ -56,6 +56,13 @@ ErrorDocument 500 /500.php
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), interest-cohort=()"
   Header always set Cross-Origin-Opener-Policy "same-origin"
+  # Every script/style tag in this app is same-origin or inline (onclick=,
+  # onsubmit=, small <script> blocks) — there is no build step to add nonces,
+  # so 'unsafe-inline' stays required. Everything else is locked to 'self':
+  # no third-party script host, no framing by another site, no cross-origin
+  # form target. Chart.js is vendored in assets/js/vendor/ for this reason —
+  # it used to load from a CDN, which this policy would otherwise block.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
   # Turn HSTS on only after HTTPS is confirmed working on every subdomain:
   # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always unset X-Powered-By
