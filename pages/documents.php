@@ -19,13 +19,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!empty($_FILES['file']['name'])) {
         $f = $_FILES['file'];
         $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+        // Extension whitelist is not enough on its own — a script or HTML file
+        // renamed to end in .pdf would still pass it. Look at what the file
+        // actually contains, the same principle includes/upload.php applies
+        // to images via getimagesize().
+        $dangerousSignature = false;
+        if ($f['error'] === UPLOAD_ERR_OK && is_uploaded_file($f['tmp_name'])) {
+            $mime = @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $f['tmp_name']);
+            $head = (string)@file_get_contents($f['tmp_name'], false, null, 0, 1024);
+            $dangerousSignature = ($mime && (str_contains($mime, 'php') || $mime === 'text/html'
+                                || str_contains($mime, 'executable') || str_contains($mime, 'x-sh')
+                                || str_contains($mime, 'x-dosexec')))
+                               || stripos($head, '<?php') !== false
+                               || stripos($head, '<script') !== false;
+        }
         if ($f['error'] !== UPLOAD_ERR_OK)          $err = 'Upload failed. Try a smaller file.';
         elseif (!in_array($ext, $allowedExt, true)) $err = 'File type not allowed. Use PDF, image, Excel or Word.';
         elseif ($f['size'] > $maxBytes)             $err = 'File is larger than 10 MB.';
+        elseif ($dangerousSignature)                $err = 'That file\'s contents do not match its extension. Please upload the original file.';
         else {
             if (!is_dir(UPLOADS_PATH)) @mkdir(UPLOADS_PATH, 0755, true);
             $safe = preg_replace('/[^A-Za-z0-9._-]/', '_', pathinfo($f['name'], PATHINFO_FILENAME));
-            $newName = $safe . '_' . time() . '.' . $ext;
+            $newName = $safe . '_' . bin2hex(random_bytes(4)) . '_' . time() . '.' . $ext;
             if (move_uploaded_file($f['tmp_name'], UPLOADS_PATH . '/' . $newName)) {
                 db()->prepare("INSERT INTO documents (entity_type, entity_id, doc_name, doc_type, file_path, uploaded_by) VALUES (?,?,?,?,?,?)")
                     ->execute([$_POST['entity_type'] ?: null, (int)($_POST['entity_id'] ?: 0) ?: null,
